@@ -11,11 +11,33 @@ public class Block {
     public String previousHash;
     private ArrayList<Transaction> data;
     private long timeStamp;
+    private int nonce;
 
     public Block(ArrayList<Transaction> data, String previousHash){
         this.data = data;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
+        this.hash = getHash();
+
+    }
+
+    public String getHash(){
+        StringBuilder sb = new StringBuilder(previousHash);
+        sb.append(timeStamp);
+        for(int x = 0; x < data.size(); x++){
+            sb.append(data.get(x));
+        }
+        sb.append(nonce);
+        return BlockHelper.calculateHash(sb.toString());
+    }
+
+    public void mine(int difficulty){
+        String target = new String(new char[difficulty]).replace('\0','0');
+
+        while(!hash.substring(0, difficulty).equals(target)){
+            nonce++;
+            hash = getHash();
+        }
     }
 
 }
