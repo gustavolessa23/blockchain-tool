@@ -1,8 +1,12 @@
 package com.gustavolessa.blockchain.transaction;
 
+import java.security.PublicKey;
 import java.util.Date;
 
 public class Transaction {
+//    public String hash;
+//    public PublicKey sender;
+//    public PublicKey recipient;
     public int type;
     public String author;
     public String message;
