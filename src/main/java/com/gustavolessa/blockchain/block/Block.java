@@ -5,13 +5,14 @@ import com.gustavolessa.blockchain.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Block {
 
     public long id;
     public String hash;
     public String previousHash;
-    private ArrayList<Transaction> data;
+    private List<Transaction> data;
 
     public long getTimeStamp() {
         return timeStamp;
@@ -20,7 +21,7 @@ public class Block {
     private long timeStamp;
     private int nonce;
 
-    public Block(ArrayList<Transaction> data, String previousHash, long lastId){
+    public Block(List<Transaction> data, String previousHash, long lastId){
         this.data = data;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();

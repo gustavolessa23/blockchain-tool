@@ -2,6 +2,7 @@ package com.gustavolessa.blockchain;
 
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.block.BlockHelper;
+import com.gustavolessa.blockchain.pool.Pool;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 import com.gustavolessa.blockchain.storage.local.LocalStorage;
 import com.gustavolessa.blockchain.transaction.Transaction;
@@ -27,6 +28,9 @@ public class Main {
         @Inject
         StorageDAO storage;
 
+        @Inject
+        Pool pool;
+
         public static int difficulty = 5;
 
         @Override
@@ -35,7 +39,7 @@ public class Main {
             List<Block> blockchain = storage.readAll();
             if (blockchain.isEmpty()) {
                 System.err.println("No saved data. Generating sample blockchain");
-                blockchain = generateSampleBlock();
+                blockchain = generateSampleBlockWithPool();
             }
 
             String json = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
@@ -51,11 +55,16 @@ public class Main {
         }
 
         public List<Block> generateSampleBlock(){
+
             Transaction t0 = new Transaction(1,"Gustavo0","Genesis0");
             Transaction t1 = new Transaction(1,"Gustavo1","Genesis1");
             Transaction t2 = new Transaction(1,"Gustavo2","Genesis2");
             Transaction t3 = new Transaction(1,"Gustavo3","Genesis3");
             Transaction t4 = new Transaction(1,"Gustavo4","Genesis4");
+
+//            pool.add(t0);
+//            pool.add(t1);
+//            pool.add(t2);
 
             Block b0 = new Block(new ArrayList<Transaction>(Arrays.asList(t0)),"0", 0);
             b0.mine(difficulty);
@@ -83,6 +92,29 @@ public class Main {
             System.out.println("Hash for block 3 = "+b4.hash);
 
             ArrayList<Block> blockchain = new ArrayList<>(Arrays.asList(b0,b1,b2,b3,b4));
+            return blockchain;
+        }
+
+        public List<Block> generateSampleBlockWithPool(){
+
+            Transaction t0 = new Transaction(1,"Gustavo0","Genesis0");
+            Transaction t1 = new Transaction(1,"Gustavo1","Genesis1");
+            Transaction t2 = new Transaction(1,"Gustavo2","Genesis2");
+            Transaction t3 = new Transaction(1,"Gustavo3","Genesis3");
+            Transaction t4 = new Transaction(1,"Gustavo4","Genesis4");
+
+            pool.add(t0);
+            pool.add(t1);
+            pool.add(t2);
+
+            Block b0 = new Block(pool.getAll(),"0", 0);
+            b0.mine(difficulty);
+            storage.saveBlock(b0);
+            System.out.println("Hash for genesis block = "+b0.hash);
+
+
+
+            ArrayList<Block> blockchain = new ArrayList<>(Arrays.asList(b0));
             return blockchain;
         }
     }
