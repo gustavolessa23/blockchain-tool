@@ -1,8 +1,13 @@
 package com.gustavolessa.blockchain.services;
 
+import com.google.gson.GsonBuilder;
+
 import java.security.MessageDigest;
 
 public class StringUtils {
+    public static String prettify(String input){
+        return new GsonBuilder().setPrettyPrinting().create().toJson(input);
+    }
     public static String applySha256(String input){
         try{
             // create a digest using SHA256 algorithm

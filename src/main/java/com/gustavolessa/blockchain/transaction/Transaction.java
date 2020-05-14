@@ -1,9 +1,10 @@
 package com.gustavolessa.blockchain.transaction;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.Date;
 
-public class Transaction {
+public class Transaction implements Serializable {
 //    public String hash;
 //    public PublicKey sender;
 //    public PublicKey recipient;

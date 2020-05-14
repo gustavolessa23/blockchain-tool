@@ -1,5 +1,6 @@
 package com.gustavolessa.blockchain.pool;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
@@ -22,7 +23,7 @@ public class TransactionPool implements Pool {
     public Transaction getFirstTransaction() {
         return queue.poll();
     }
-
+// https://www.apache.org/dyn/closer.cgi?filename=activemq/activemq-artemis/2.12.0/apache-artemis-2.12.0-bin.tar.gz&action=download
     @Override
     public List<Transaction> getTransactions(int n) {
         List<Transaction> list = new ArrayList<>();
@@ -49,5 +50,22 @@ public class TransactionPool implements Pool {
             System.out.println("Could not clear transactions pool");
             return false;
         }
+    }
+
+    public void removeTransaction(Transaction t){
+        queue.poll();
+    }
+
+    public Transaction pool(){
+        return queue.poll();
+    }
+
+    public boolean isEmpty(){
+        return queue.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 }

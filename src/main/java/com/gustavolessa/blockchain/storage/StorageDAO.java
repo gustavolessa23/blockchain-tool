@@ -9,5 +9,4 @@ public interface StorageDAO {
     List<Block> readAll();
     Block findById(long id);
     Block findByHash(String hash);
-
 }
