@@ -1,8 +1,6 @@
 package com.gustavolessa.blockchain.network;
 
 
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +10,8 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.jms.*;
 
-import com.gustavolessa.blockchain.pool.TransactionPool;
+import com.gustavolessa.blockchain.block.Block;
+import com.gustavolessa.blockchain.pool.BlockPool;
 import com.gustavolessa.blockchain.transaction.Transaction;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -24,19 +23,17 @@ import io.quarkus.runtime.StartupEvent;
 public class Producer implements Runnable {
 
     @Inject
-    TransactionPool pool;
+    BlockPool pool;
 
     @Inject
     ConnectionFactory connectionFactory;
 
-
-
-    private Transaction t;
+    private Block b;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     void onStart(@Observes StartupEvent ev) {
-        scheduler.scheduleWithFixedDelay(this, 0L, 5L, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(this, 2L, 5L, TimeUnit.SECONDS);
     }
 
     void onStop(@Observes ShutdownEvent ev) {
@@ -47,17 +44,16 @@ public class Producer implements Runnable {
     public void run() {
         if(!pool.isEmpty()){
 
-//                Transaction t = pool.getFirstTransaction();
-            t = pool.getFirstTransaction();
+            b = pool.getFirstBlock();
 
                 try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-                    System.out.println("Sending transaction = "+t.toString());
-                    TextMessage message = context.createTextMessage(t.toString());
+                    System.out.println("Sending block = "+ b.toString());
+                    TextMessage message = context.createTextMessage(b.toString());
 //                    System.out.println("TextMessage "+message.getText());
 //                    Queue queue = context.createQueue("transactions");
 //                    JMSProducer producer = context.createProducer();
                   //  producer.send(context.createQueue("transactions"), message);
-                    context.createProducer().send(context.createQueue("transactions"),message);
+                    context.createProducer().send(context.createQueue("blocks"),message);
                 } catch(Exception e){
                     e.printStackTrace();
                 }

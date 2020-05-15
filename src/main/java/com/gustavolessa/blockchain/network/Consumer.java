@@ -1,6 +1,5 @@
 package com.gustavolessa.blockchain.network;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +12,6 @@ import javax.jms.*;
 import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.transaction.Transaction;
-import com.gustavolessa.blockchain.transaction.TransactionHelper;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 
@@ -28,9 +26,7 @@ public class Consumer implements Runnable {
 
     private volatile String data;
 
-    private volatile Transaction t;
-
-    private volatile Block block;
+    private volatile Block b;
 
     public String getData() {
         return data;
@@ -48,7 +44,7 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
         try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createQueue("transactions"));
+            JMSConsumer consumer = context.createConsumer(context.createQueue("blocks"));
             while (true) {
                 TextMessage message = (TextMessage)consumer.receive();
                 if (message == null) {
@@ -59,15 +55,15 @@ public class Consumer implements Runnable {
 
                         String retrieved = message.getText();
                         Gson gson = new Gson();
-                        Object obj = gson.fromJson(retrieved, Transaction.class);
+                        Object obj = gson.fromJson(retrieved, Block.class);
                        // System.out.println("Object is "+obj.toString());
-                        t = (Transaction) obj;
+                        b = (Block) obj;
                        // System.out.println("Transaction is "+t);
                     }
                 }
-                System.err.println("Received Transaction: "+t.toString());
+                System.err.println("Received block: "+ b.toString());
             //    System.err.println("Is the transaction valid? "+ TransactionHelper.validateTransaction(t));
-                System.err.println("Is the transaction valid? "+ t.calculateHash().equals(t.getHash()));
+            //    System.err.println("Is the block valid? "+ BlockHelper.isChainValid(t, Main.BlockchainTool.difficulty);
 
             }
         } catch (JMSException e) {

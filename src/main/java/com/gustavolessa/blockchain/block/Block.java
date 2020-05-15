@@ -41,7 +41,7 @@ public class Block {
             nonce++;
             hash = calculateHash();
         }
-        System.out.println("Block mined "+this);
+        System.out.println("MINED: "+this);
         return true;
     }
 
