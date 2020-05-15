@@ -24,6 +24,14 @@ public class Block {
         this.hash = this.calculateHash();
     }
 
+    public Block(List<Transaction> data){
+        this.id = 0;
+        this.data = data;
+        this.previousHash = "";
+        this.timeStamp = new Date().getTime();
+        this.hash = this.calculateHash();
+    }
+
     public String calculateHash(){
         StringBuilder sb = new StringBuilder(previousHash);
         sb.append(timeStamp);
@@ -36,12 +44,14 @@ public class Block {
 
     public boolean mine(int difficulty){
         String target = new String(new char[difficulty]).replace('\0','0');
+            while(!hash.substring(0, difficulty).equals(target)){
+                nonce++;
+                hash = calculateHash();
+            }
+            //  System.err.println("MINED: "+this);
+            System.err.println("Block mined.");
+       //     notify();
 
-        while(!hash.substring(0, difficulty).equals(target)){
-            nonce++;
-            hash = calculateHash();
-        }
-        System.out.println("MINED: "+this);
         return true;
     }
 
@@ -68,8 +78,16 @@ public class Block {
         return nonce;
     }
 
+    public void setPreviousHash(String previousHash) {
+        this.previousHash = previousHash;
+    }
+
     @Override
     public String toString() {
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

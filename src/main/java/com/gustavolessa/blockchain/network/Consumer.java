@@ -11,11 +11,16 @@ import javax.jms.*;
 
 import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
+import com.gustavolessa.blockchain.chain.Blockchain;
+import com.gustavolessa.blockchain.chain.BlockchainHelper;
+import com.gustavolessa.blockchain.storage.local.LocalStorage;
 import com.gustavolessa.blockchain.transaction.Transaction;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 
-
+/**
+ * Consumer class
+ */
 @ApplicationScoped
 public class Consumer implements Runnable {
 
@@ -27,6 +32,12 @@ public class Consumer implements Runnable {
     private volatile String data;
 
     private volatile Block b;
+
+    @Inject
+    private LocalStorage storage;
+
+    @Inject
+    private Blockchain chain;
 
     public String getData() {
         return data;
@@ -62,6 +73,15 @@ public class Consumer implements Runnable {
                     }
                 }
                 System.err.println("Received block: "+ b.toString());
+
+                if(BlockchainHelper.blockCanBeInserted(chain, b)){
+                    System.err.println("Received block can be inserted!");
+                    chain.add(b);
+                    storage.saveBlock(b);
+                } else {
+                    System.err.println("Received block invalid");
+                }
+
             //    System.err.println("Is the transaction valid? "+ TransactionHelper.validateTransaction(t));
             //    System.err.println("Is the block valid? "+ BlockHelper.isChainValid(t, Main.BlockchainTool.difficulty);
 
