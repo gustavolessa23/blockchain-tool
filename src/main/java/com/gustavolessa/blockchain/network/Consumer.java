@@ -12,6 +12,8 @@ import javax.jms.*;
 
 import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
+import com.gustavolessa.blockchain.transaction.Transaction;
+import com.gustavolessa.blockchain.transaction.TransactionHelper;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 
@@ -25,6 +27,8 @@ public class Consumer implements Runnable {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private volatile String data;
+
+    private volatile Transaction t;
 
     private volatile Block block;
 
@@ -47,29 +51,24 @@ public class Consumer implements Runnable {
             JMSConsumer consumer = context.createConsumer(context.createQueue("transactions"));
             while (true) {
                 TextMessage message = (TextMessage)consumer.receive();
-                if (message != null) {
-                    System.out.println("Message received "+message);
-                    System.out.println("TextMessage "+message.getText());
+                if (message == null) {
+                    return;
+                } else {
+                    if (message != null) {
+                      //  System.out.println("TextMessage "+message.getText());
 
-                   String retrieved = ((TextMessage) message).getText();
-                    Gson gson = new Gson();
-                    Object obj = gson.fromJson(retrieved, Block.class);
-                    System.out.println("Object is "+obj.toString());
-                    block = (Block) obj;
-                    System.out.println("Block is "+block);
-
-                    System.out.println(block);
+                        String retrieved = message.getText();
+                        Gson gson = new Gson();
+                        Object obj = gson.fromJson(retrieved, Transaction.class);
+                       // System.out.println("Object is "+obj.toString());
+                        t = (Transaction) obj;
+                       // System.out.println("Transaction is "+t);
+                    }
                 }
-                if (message == null) return;
-//                if (message instanceof ObjectMessage){
+                System.err.println("Received Transaction: "+t.toString());
+            //    System.err.println("Is the transaction valid? "+ TransactionHelper.validateTransaction(t));
+                System.err.println("Is the transaction valid? "+ t.calculateHash().equals(t.getHash()));
 
-//                }
-
-                //data = message.getBody(String.class);
-
-                System.err.println("Received Block: "+block.toString());
-
-               // System.err.println("Received Data: "+data);
             }
         } catch (JMSException e) {
             throw new RuntimeException(e);

@@ -12,10 +12,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @ApplicationScoped
 public class TransactionPool implements Pool {
-    Queue<Transaction> queue = new ConcurrentLinkedQueue<>();
 
+
+    private Queue<Transaction> queue = new ConcurrentLinkedQueue<>();
+
+    public Queue<Transaction> getQueue() {
+        return queue;
+    }
     @Override
     public boolean add(Transaction t) {
+        System.out.println("POOL: transaction added "+t);
         return queue.add(t);
     }
 
@@ -23,7 +29,7 @@ public class TransactionPool implements Pool {
     public Transaction getFirstTransaction() {
         return queue.poll();
     }
-// https://www.apache.org/dyn/closer.cgi?filename=activemq/activemq-artemis/2.12.0/apache-artemis-2.12.0-bin.tar.gz&action=download
+
     @Override
     public List<Transaction> getTransactions(int n) {
         List<Transaction> list = new ArrayList<>();
@@ -52,13 +58,6 @@ public class TransactionPool implements Pool {
         }
     }
 
-    public void removeTransaction(Transaction t){
-        queue.poll();
-    }
-
-    public Transaction pool(){
-        return queue.poll();
-    }
 
     public boolean isEmpty(){
         return queue.isEmpty();

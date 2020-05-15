@@ -29,6 +29,8 @@ public class Producer implements Runnable {
     @Inject
     ConnectionFactory connectionFactory;
 
+
+
     private Transaction t;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -46,19 +48,16 @@ public class Producer implements Runnable {
         if(!pool.isEmpty()){
 
 //                Transaction t = pool.getFirstTransaction();
-            t = pool.pool();
-
-            System.out.println("Trying to send "+t.timeStamp);
+            t = pool.getFirstTransaction();
 
                 try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-                    System.out.println("T to String = "+t.toString());
+                    System.out.println("Sending transaction = "+t.toString());
                     TextMessage message = context.createTextMessage(t.toString());
-                    System.out.println("TextMessage "+message.getText());
+//                    System.out.println("TextMessage "+message.getText());
 //                    Queue queue = context.createQueue("transactions");
 //                    JMSProducer producer = context.createProducer();
                   //  producer.send(context.createQueue("transactions"), message);
                     context.createProducer().send(context.createQueue("transactions"),message);
-                    pool.removeTransaction(t);
                 } catch(Exception e){
                     e.printStackTrace();
                 }

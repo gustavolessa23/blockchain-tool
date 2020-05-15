@@ -9,44 +9,63 @@ import java.util.List;
 
 public class Block {
 
-    public long id;
-    public String hash;
-    public String previousHash;
+    private long id;
+    private String hash;
+    private String previousHash;
     private List<Transaction> data;
-
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
     private long timeStamp;
     private int nonce;
 
     public Block(List<Transaction> data, String previousHash, long lastId){
+        this.id = lastId + 1;
         this.data = data;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
-        this.hash = getHash();
-        this.id = lastId + 1;
-
+        this.hash = this.calculateHash();
     }
 
-    public String getHash(){
+    public String calculateHash(){
         StringBuilder sb = new StringBuilder(previousHash);
         sb.append(timeStamp);
         for(int x = 0; x < data.size(); x++){
             sb.append(data.get(x));
         }
         sb.append(nonce);
-        return BlockHelper.calculateHash(sb.toString());
+        return BlockHelper.hash(sb.toString());
     }
 
-    public void mine(int difficulty){
+    public boolean mine(int difficulty){
         String target = new String(new char[difficulty]).replace('\0','0');
 
         while(!hash.substring(0, difficulty).equals(target)){
             nonce++;
-            hash = getHash();
+            hash = calculateHash();
         }
+        System.out.println("Block mined "+this);
+        return true;
+    }
+
+    public String getHash(){
+        return hash;
+    }
+    public long getId() {
+        return id;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public List<Transaction> getData() {
+        return data;
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public int getNonce() {
+        return nonce;
     }
 
     @Override

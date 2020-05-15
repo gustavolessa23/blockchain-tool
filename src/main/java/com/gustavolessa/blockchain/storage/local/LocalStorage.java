@@ -33,8 +33,8 @@ public class LocalStorage implements StorageDAO {
         try {
             Files.createDirectories(path);
             String blockJson = new GsonBuilder().setPrettyPrinting().create().toJson(block);
-            Files.write(path.resolve(block.hash), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-
+            Path returned = Files.write(path.resolve(block.getHash()), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            System.out.println("Block saved at: "+returned);
             return 1;
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
@@ -67,7 +67,7 @@ public class LocalStorage implements StorageDAO {
             byte[] content = Files.readAllBytes(path);
             Object obj = gson.fromJson(new String(content), Block.class);
             Block block = (Block) obj;
-            System.out.println("Hash read: " + block.hash);
+            System.out.println("Hash read: " + block.getHash());
 
             return block;
         } catch (JsonSyntaxException e) {

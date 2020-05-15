@@ -39,7 +39,7 @@ public class Main {
         @Inject
         Pool pool;
 
-        public static int difficulty = 5;
+        public static int difficulty = 3;
 
         @Override
         public int run(String... args) throws Exception {
@@ -73,27 +73,27 @@ public class Main {
             Block b0 = new Block(new ArrayList<Transaction>(Arrays.asList(t0)),"0", 0);
             b0.mine(difficulty);
             storage.saveBlock(b0);
-            System.out.println("Hash for genesis block = "+b0.hash);
+            System.out.println("Hash for genesis block = "+ b0.getHash());
 
-            Block b1 = new Block(new ArrayList<Transaction>(Arrays.asList(t1)),b0.hash,b0.id);
+            Block b1 = new Block(new ArrayList<Transaction>(Arrays.asList(t1)), b0.getHash(), b0.getId());
             b1.mine(difficulty);
             storage.saveBlock(b1);
-            System.out.println("Hash for block 1 = "+b1.hash);
+            System.out.println("Hash for block 1 = "+ b1.getHash());
 
-            Block b2 = new Block(new ArrayList<Transaction>(Arrays.asList(t2)),b1.hash, b1.id);
+            Block b2 = new Block(new ArrayList<Transaction>(Arrays.asList(t2)), b1.getHash(), b1.getId());
             b2.mine(difficulty);
             storage.saveBlock(b2);
-            System.out.println("Hash for block 2 = "+b2.hash);
+            System.out.println("Hash for block 2 = "+ b2.getHash());
 
-            Block b3 = new Block(new ArrayList<Transaction>(Arrays.asList(t3)),b2.hash, b2.id);
+            Block b3 = new Block(new ArrayList<Transaction>(Arrays.asList(t3)), b2.getHash(), b2.getId());
             b3.mine(difficulty);
             storage.saveBlock(b3);
-            System.out.println("Hash for block 3 = "+b3.hash);
+            System.out.println("Hash for block 3 = "+ b3.getHash());
 
-            Block b4 = new Block(new ArrayList<Transaction>(Arrays.asList(t4)),b3.hash, b3.id);
+            Block b4 = new Block(new ArrayList<Transaction>(Arrays.asList(t4)), b3.getHash(), b3.getId());
             b4.mine(difficulty);
             storage.saveBlock(b4);
-            System.out.println("Hash for block 3 = "+b4.hash);
+            System.out.println("Hash for block 3 = "+ b4.getHash());
 
             ArrayList<Block> blockchain = new ArrayList<>(Arrays.asList(b0,b1,b2,b3,b4));
             return blockchain;
@@ -107,19 +107,18 @@ public class Main {
             Transaction t3 = new Transaction(1,"Gustavo3","Genesis3");
             Transaction t4 = new Transaction(1,"Gustavo4","Genesis4");
 
+
+            //Block b0 = new Block(pool.getAll(),"0", 0);
+            Block genesis = new Block(Arrays.asList(t0),"0", 1L);
+            genesis.mine(difficulty);
+            storage.saveBlock(genesis);
+            System.out.println("Hash for genesis block = "+ genesis.getHash());
+
             pool.add(t0);
             pool.add(t1);
             pool.add(t2);
             pool.add(t3);
             pool.add(t4);
-
-            //Block b0 = new Block(pool.getAll(),"0", 0);
-            Block genesis = new Block(Arrays.asList(t0),"0", 0L);
-            genesis.mine(difficulty);
-            storage.saveBlock(genesis);
-            System.out.println("Hash for genesis block = "+genesis.hash);
-
-
 
             ArrayList<Block> blockchain = new ArrayList<>(Arrays.asList(genesis));
             return blockchain;
