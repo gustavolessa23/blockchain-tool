@@ -1,29 +1,28 @@
 package com.gustavolessa.blockchain.network;
 
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.gustavolessa.blockchain.block.Block;
+import com.gustavolessa.blockchain.pool.TransmissionPool;
+import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.jms.*;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import com.gustavolessa.blockchain.block.Block;
-import com.gustavolessa.blockchain.pool.BlockPool;
-import com.gustavolessa.blockchain.transaction.Transaction;
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
 
-/**
- * A bean producing random prices every 5 seconds and sending them to the prices JMS queue.
- */
 @ApplicationScoped
 public class Producer implements Runnable {
 
     @Inject
-    BlockPool pool;
+    TransmissionPool pool;
 
     @Inject
     ConnectionFactory connectionFactory;

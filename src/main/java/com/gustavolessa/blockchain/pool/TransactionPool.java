@@ -21,7 +21,7 @@ public class TransactionPool implements Pool {
     }
     @Override
     public boolean add(Transaction t) {
-        System.out.println("POOL: transaction added "+t);
+        System.out.println("Transaction added "+t.getHash());
         return queue.add(t);
     }
 

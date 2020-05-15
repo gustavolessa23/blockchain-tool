@@ -12,10 +12,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @ApplicationScoped
-public class BlockPool {
-
-    @Inject
-    StorageDAO storage;
+public class TransmissionPool {
 
     private Queue<Block> queue = new ConcurrentLinkedQueue<>();
 
@@ -23,8 +20,7 @@ public class BlockPool {
         return queue;
     }
     public boolean add(Block t) {
-        System.out.println("POOL: block added "+t);
-        storage.saveBlock(t);
+        System.out.println("TRANSMISSION POOL: block added "+t.getId());
         return queue.add(t);
     }
 
@@ -49,10 +45,10 @@ public class BlockPool {
     public boolean clear() {
         queue.clear();
         if (queue.isEmpty()) {
-            System.out.println("Block pool cleared!");
+            System.out.println("Transmission pool cleared!");
             return true;
         } else {
-            System.out.println("Could not clear Block pool");
+            System.out.println("Could not clear transmission pool");
             return false;
         }
     }
