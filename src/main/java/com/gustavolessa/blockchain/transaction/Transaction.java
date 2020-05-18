@@ -1,9 +1,6 @@
 package com.gustavolessa.blockchain.transaction;
 
-import com.gustavolessa.blockchain.block.BlockHelper;
-
 import java.io.Serializable;
-import java.security.PublicKey;
 import java.util.Date;
 
 public class Transaction implements Serializable {

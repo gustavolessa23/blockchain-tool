@@ -2,10 +2,8 @@ package com.gustavolessa.blockchain.chain;
 
 import com.google.gson.GsonBuilder;
 import com.gustavolessa.blockchain.block.Block;
-import com.gustavolessa.blockchain.storage.StorageDAO;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 

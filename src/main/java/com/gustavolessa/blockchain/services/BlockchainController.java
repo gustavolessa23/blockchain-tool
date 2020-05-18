@@ -1,21 +1,14 @@
 package com.gustavolessa.blockchain.services;
 
-import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.chain.Blockchain;
-import com.gustavolessa.blockchain.pool2.MiningPool;
-import com.gustavolessa.blockchain.pool2.TransactionPool;
-import com.gustavolessa.blockchain.pool2.TransmissionPool;
+import com.gustavolessa.blockchain.pool.MiningPool;
+import com.gustavolessa.blockchain.pool.TransactionPool;
+import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 @Path("/blockchain")
 @Produces(MediaType.APPLICATION_JSON)

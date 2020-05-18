@@ -10,8 +10,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.gustavolessa.blockchain.Main.BlockchainTool.difficulty;
 @ApplicationScoped
 public class SampleBlockGenerator {
 
@@ -55,14 +53,14 @@ public class SampleBlockGenerator {
         System.out.println("BLOCK SIZEEEEEEE "+blockchain.size());
 
         // Get two and add to a new block
-        List<Transaction> firstTwo = transactionPool.getTransactions(2);
+        List<Transaction> firstTwo = transactionPool.getMany(2);
         Block b1 = new Block(
                 firstTwo,
                 blockchain.get(blockchain.size()-1).getHash(),
                 blockchain.get(blockchain.size()-1).getId());
         miningPool.add(b1);
 
-        List<Transaction> secondTwo = transactionPool.getTransactions(2);
+        List<Transaction> secondTwo = transactionPool.getMany(2);
         Block b2 = new Block(
                 secondTwo,
                 blockchain.get(blockchain.size()-1).getHash(),

@@ -43,7 +43,7 @@ public class Producer implements Runnable {
     public void run() {
         if(!pool.isEmpty()){
 
-            b = pool.getFirstBlock();
+            b = pool.getFirst();
 
                 try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
                     System.out.println("Sending block = "+ b.toString());

@@ -1,22 +1,20 @@
 package com.gustavolessa.blockchain.network;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-import javax.jms.*;
-
 import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.chain.BlockchainHelper;
 import com.gustavolessa.blockchain.storage.local.LocalStorage;
-import com.gustavolessa.blockchain.transaction.Transaction;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.jms.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Consumer class

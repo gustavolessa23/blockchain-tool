@@ -1,6 +1,4 @@
-package com.gustavolessa.blockchain.pool2;
-
-import com.gustavolessa.blockchain.transaction.Transaction;
+package com.gustavolessa.blockchain.pool;
 
 import java.util.List;
 
@@ -13,10 +11,14 @@ public interface GenericPool<T> {
 
     List<T> getAll();
 
+    List<T> readMany(int n);
+
+    List<T> readAll();
+
     boolean clear();
 
     boolean isEmpty();
 
-    T peek();
+    T readFirst();
     
 }

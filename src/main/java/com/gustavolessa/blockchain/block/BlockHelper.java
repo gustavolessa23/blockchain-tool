@@ -1,6 +1,5 @@
 package com.gustavolessa.blockchain.block;
 
-import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.services.StringUtils;
 
 import java.util.List;

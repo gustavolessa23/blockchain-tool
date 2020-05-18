@@ -3,7 +3,6 @@ package com.gustavolessa.blockchain.block;
 import com.google.gson.GsonBuilder;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

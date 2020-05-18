@@ -66,7 +66,7 @@ public class Main {
             // Send a block using the architecture
             Transaction t1 = new Transaction(1,"Amílcar","Design Patterns");
             transactionPool.add(t1);
-            Block b = new Block(Arrays.asList(transactionPool.getFirstTransaction()));
+            Block b = new Block(Arrays.asList(transactionPool.getFirst()));
             miningPool.add(b);
 
 

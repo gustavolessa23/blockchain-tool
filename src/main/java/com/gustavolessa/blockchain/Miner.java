@@ -1,12 +1,10 @@
 package com.gustavolessa.blockchain;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.block.BlockHelper;
 import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.pool.MiningPool;
-import com.gustavolessa.blockchain.pool.TransactionPool;
 import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 import io.quarkus.runtime.ShutdownEvent;
@@ -15,7 +13,6 @@ import io.quarkus.runtime.StartupEvent;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.jms.*;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,7 +53,7 @@ public class Miner implements Runnable {
     @Override
     public void run() {
         if(!miningPool.isEmpty()){
-            Block blockToMine = miningPool.getFirstBlock();
+            Block blockToMine = miningPool.getFirst();
             long previousId = 0L;
             String previousHash = "0";
 
