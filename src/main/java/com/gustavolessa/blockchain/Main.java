@@ -59,7 +59,7 @@ public class Main {
 
             menu.startMenu();
 
-            Quarkus.waitForExit();
+           // Quarkus.waitForExit();
 
             return 0;
         }

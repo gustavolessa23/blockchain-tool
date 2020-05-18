@@ -13,6 +13,7 @@ import com.gustavolessa.blockchain.pool.TransactionPool;
 import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 import com.gustavolessa.blockchain.transaction.Transaction;
+import io.quarkus.runtime.Quarkus;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -58,20 +59,23 @@ public class Runner {
         miner.startMining();
         producer.startSending();
         consumer.startListening();
+        init = true;
+    }
 
+    public void readOrGenerateGenesis(){
         System.out.println("Reading saved blocks.");
         List<Block> fromStorage = storage.readAll();
 
         if (fromStorage.isEmpty()) {
-            System.err.println("No data found. Generating sample blockchain.");
-            generator.generateSampleBlockchainWithPool();
+            System.out.println("No blocks found.");
+            generator.generateGenesisBlock();
         } else {
             System.err.println("Reading blocks from storage.");
             for (Block b : fromStorage) {
                 transmissionPool.add(b);
                 chain.add(b);
                 try {
-                    Thread.sleep(2300);
+                    Thread.sleep(800);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     e.printStackTrace();
@@ -80,25 +84,25 @@ public class Runner {
             if (!BlockchainHelper.isChainValid(chain.getAll(), difficulty)) {
                 System.err.println("Blockchain invalid --> resetting");
                 chain.reset();
-                System.err.println("Generating sample blockchain.");
+                System.out.println("Generating sample blockchain.");
                 generator.generateSampleBlockchainWithPool();
             }
         }
-
-
-        init = true;
     }
+
 
     public boolean isInit(){
         return init;
     }
 
     public void runTest(){
-        try {
-            if(!init) init();
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(!init){
+            init();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         sendBlockFromOutside();
     }
@@ -129,6 +133,14 @@ public class Runner {
                 System.err.println("Block invalid for the chain.");
             }
         }
+    }
+
+    public void exitApplication() {
+        System.err.println("Shutting down Blockchain Demonstration Tool");
+        consumer.stopListening();
+        producer.stopSending();
+        miner.stopMining();
+        Quarkus.asyncExit();
     }
 
 }

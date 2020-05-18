@@ -47,7 +47,7 @@ public class Producer implements Runnable {
         if (scheduler != null) scheduler.shutdown();
         resetExecutor();
             System.out.println("Starting to send new blocks...");
-            scheduler.scheduleWithFixedDelay(this, 1L, 2L, TimeUnit.SECONDS);
+            scheduler.scheduleWithFixedDelay(this, 0L, 300L, TimeUnit.MILLISECONDS);
     }
 
     public void stopSending(){

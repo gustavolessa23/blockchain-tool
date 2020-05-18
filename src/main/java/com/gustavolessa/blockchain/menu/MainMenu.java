@@ -77,7 +77,8 @@ public class MainMenu extends Menu{
                 "Save all blocks to storage",
                 "Reset blockchain",
                 "Find block by ID",
-                "Run testing solution",
+                "Run testing solution / sample blockchain",
+                "Initialise blockchain",
                 "Exit Program"};
         this.setOptions(options);
         this.setTitle("Blockchain Demonstration Tool");
@@ -90,77 +91,72 @@ public class MainMenu extends Menu{
      */
     @Override
     public void optionSelector() {
-        int option = intFromInput("Please choose an option:");
-        switch (option) {
-            case 1:
-                System.out.println(blockchain.getAll());
-                break;
-            case 2:
-                addTransaction();
-                break;
-            case 3:
-                miner.run();
-                break;
-            case 4:
-                miner.flipSwitch();
-                break;
-            case 5:
-                consumer.flipSwitch();
-                break;
-            case 6:
-                producer.flipSwitch();
-                break;
-            case 7:
-                System.out.println(transactionPool.readAll());
-                break;
-            case 8:
-                System.out.println(this.transmissionPool.readAll());
-                break;
-            case 9:
-                System.out.println(miningPool.readAll());
-                break;
-            case 10:
-                storage.readAll();
-                break;
-            case 11:
-                storage.writeAll(blockchain.getAll());
-                break;
-            case 12:
-                BlockchainHelper.resetBlockchain(blockchain, storage);
-                break;
-            case 13:
-                blockById();
-                break;
-            case 14:
-                testSolution();
-                break;
-            case 15:
-               // Quarkus.asyncExit();
-                this.exit();
-                break;
-            case 16:
-                Quarkus.blockingExit();
-                break;
-            case 17:
-                Quarkus.asyncExit();
-                break;
-            case 18:
-                forceExit();
-                break;
-            default:
-                System.out.println("\n*** Invalid option. Please try again ***\n");
-                this.startMenu();
-                break;
-        }
-
+      //  while(true){
+            int option = intFromInput("Please choose an option:");
+            switch (option) {
+                case 1:
+                    System.out.println(blockchain.getAll());
+                    break;
+                case 2:
+                    addTransaction();
+                    break;
+                case 3:
+                    new Thread(miner).start();
+                    break;
+                case 4:
+                    miner.flipSwitch();
+                    break;
+                case 5:
+                    consumer.flipSwitch();
+                    break;
+                case 6:
+                    producer.flipSwitch();
+                    break;
+                case 7:
+                    System.out.println(transactionPool.readAll());
+                    break;
+                case 8:
+                    System.out.println(this.transmissionPool.readAll());
+                    break;
+                case 9:
+                    System.out.println(miningPool.readAll());
+                    break;
+                case 10:
+                    storage.readAll();
+                    break;
+                case 11:
+                    storage.writeAll(blockchain.getAll());
+                    break;
+                case 12:
+                    BlockchainHelper.resetBlockchain(blockchain, storage);
+                    break;
+                case 13:
+                    blockById();
+                    break;
+                case 14:
+                    testSolution();
+                    break;
+                case 15:
+                    runner.readOrGenerateGenesis();
+                    break;
+                case 16:
+                    this.forceExit();
+                    break;
+                default:
+                    System.out.println("\n*** Invalid option. Please try again ***\n");
+//                    this.startMenu();
+                    break;
+            }
+            this.startMenu();
+    //    }
     }
 
     public void forceExit(){
-        consumer.stopListening();
-        producer.stopSending();
-        miner.stopMining();
-        Quarkus.asyncExit();
+        this.exit();
+        runner.exitApplication();
     }
+
+
 
     public void testSolution(){
         System.out.println("The program will create sample transactions and mine three a few blocks, sending them as soon as ready.");
@@ -203,28 +199,6 @@ public class MainMenu extends Menu{
         System.out.println(t);
     }
 
-    public void exit(){
-//        Se1t<Thread> threads = Thread.getAllStackTraces().keySet();
-//
-//        for (Thread t : threads) {
-//            String name = t.getName();
-//            Thread.State state = t.getState();
-//            int priority = t.getPriority();
-//            String type = t.isDaemon() ? "Daemon" : "Normal";
-//            System.out.printf("%-20s \t %s \t %d \t %s\n", name, state, priority, type);
-//        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //LOGGER.info("About to system exit.");
-                consumer.stopListening();
-                producer.stopSending();
-                miner.stopMining();
-                Quarkus.asyncExit();
-                System.exit(0);
-            }
-        }).start();
-    }
 
 
 }

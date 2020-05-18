@@ -15,6 +15,7 @@ import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.services.DataValidation;
 import com.gustavolessa.blockchain.services.Runner;
 import com.gustavolessa.blockchain.storage.StorageDAO;
+import io.quarkus.runtime.Quarkus;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -74,10 +75,22 @@ public abstract class Menu {
      * While the exit option is not chosen it will keep the menu on a loop.
      */
     public final void startMenu(){
-        while(!this.exit){
+        if(!this.exit){
             this.displayMenu();
             this.optionSelector();
+//            if (this.exit){
+//                in.close();
+//                Quarkus.asyncExit();
+//            }
         }
+    }
+
+    public void exit(){
+        this.exit = true;
+//        this.consumer.stopListening();
+//        this.producer.stopSending();
+//        this.miner.stopMining();
+       // Quarkus.asyncExit();
     }
     
     /**

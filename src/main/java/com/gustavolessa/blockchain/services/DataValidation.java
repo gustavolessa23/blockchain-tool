@@ -28,9 +28,9 @@ public class DataValidation {
      */
     public static int checkForInt(Scanner input){
         try{return input.nextInt();}
-        catch(InputMismatchException e){
+        catch(Exception e){
             input.next();
-            return checkForInt(input);
+            return -1;
         }
     }
     

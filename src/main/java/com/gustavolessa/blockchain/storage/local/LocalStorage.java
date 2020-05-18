@@ -11,10 +11,8 @@ import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -24,15 +22,29 @@ import java.util.stream.Stream;
 @ApplicationScoped
 public class LocalStorage implements StorageDAO {
 
-    static final Path path = Paths.get("blockdata");
+    static Path path;
     static String folder = "blockdata";
 //    static String PATH = File.pathSeparatorChar + folder + File.pathSeparatorChar;
 
 
+    public LocalStorage(){
+        this.getPath();
+    }
+
+    public void getPath(){
+        try{
+            path = Paths.get("blockdata");
+            Files.createDirectory(path);
+        } catch (IOException e) {
+          //  e.printStackTrace();
+        } catch (Exception e){
+
+        }
+    }
     @Override
     public int saveBlock(Block block) {
         try {
-            Files.createDirectories(path);
+            Files.createDirectory(path);
             String blockJson = new GsonBuilder().setPrettyPrinting().create().toJson(block);
             Path returned = Files.write(path.resolve(block.getHash()), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             System.out.println("Block saved at: "+returned);
@@ -58,14 +70,15 @@ public class LocalStorage implements StorageDAO {
 
         } catch (IOException e) {
             e.printStackTrace();
+            return new ArrayList<Block>();
         }
-        return null;
     }
 
     @Override
     public void clear() {
         try (Stream<Path> walk = Files.walk(path)) {
             walk.sorted(Comparator.reverseOrder())
+                    .filter(Files::isRegularFile)
                     .map(Path::toFile)
                     .forEach(File::delete);
         } catch (IOException e) {

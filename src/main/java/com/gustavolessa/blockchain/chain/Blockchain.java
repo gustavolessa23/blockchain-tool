@@ -5,6 +5,7 @@ import com.gustavolessa.blockchain.block.Block;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 @ApplicationScoped
@@ -76,8 +77,17 @@ public class Blockchain implements Cloneable{
     }
 
     public void reset(){
-        for(Block b : blockchain){
-            if(blockchain.indexOf(b) > 0) blockchain.remove(b);
-        }
+        blockchain = List.copyOf(blockchain).subList(0, 0);
+
+//        for(Block b : blockchain){
+////            if(blockchain.indexOf(b) > 0) {
+////                try{
+////                    blockchain.remove(b);
+////                }catch (ConcurrentModificationException e){
+////
+////                }
+////
+////            }
+//        }
     }
 }

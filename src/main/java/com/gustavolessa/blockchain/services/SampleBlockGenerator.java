@@ -4,6 +4,7 @@ import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.pool.MiningPool;
 import com.gustavolessa.blockchain.pool.TransactionPool;
+import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -12,6 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 @ApplicationScoped
 public class SampleBlockGenerator {
+
+    @Inject
+    TransmissionPool transmissionPool;
 
     @Inject
     MiningPool miningPool;
@@ -25,7 +29,7 @@ public class SampleBlockGenerator {
     public void generateGenesisBlock(){
         // Generate genesis block
         System.err.println("Generating Genesis block...");
-        Transaction t0 = new Transaction(1,"Gustavo","GENESIS");
+        Transaction t0 = new Transaction(1,"GENESIS","GENESIS BLOCK15");
         Block genesis = new Block(Arrays.asList(t0),"0", 0);
         miningPool.add(genesis);
 
@@ -37,6 +41,11 @@ public class SampleBlockGenerator {
                 e.printStackTrace();
             }
         }
+
+        Block mined = blockchain.get(0);
+        transmissionPool.add(mined);
+
+
     }
 
     public void createSampleTransactions(){

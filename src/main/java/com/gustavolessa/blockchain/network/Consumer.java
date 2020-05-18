@@ -60,7 +60,7 @@ public class Consumer implements Runnable {
     }
 
     public void stopListening() {
-        System.out.println("Stopping to send new blocks...");
+        System.out.println("Stopping to listen to new blocks...");
         scheduler.shutdown();
        // resetExecutor();
     }
