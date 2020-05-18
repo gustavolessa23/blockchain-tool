@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.block.BlockHelper;
 import com.gustavolessa.blockchain.chain.Blockchain;
+import com.gustavolessa.blockchain.chain.BlockchainHelper;
 import com.gustavolessa.blockchain.pool.MiningPool;
 import com.gustavolessa.blockchain.pool.TransmissionPool;
+import com.gustavolessa.blockchain.services.Runner;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class Miner implements Runnable {
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
     @Inject
     MiningPool miningPool;
@@ -39,12 +41,44 @@ public class Miner implements Runnable {
     @Inject
     TransmissionPool transmissionPool;
 
-    //private volatile Block b;
-
-    void onStart(@Observes StartupEvent ev) {
- //       scheduler.submit(this);
-        scheduler.scheduleWithFixedDelay(this, 1L, 1L, TimeUnit.SECONDS);
+    public Miner(){
+        this.resetExecutor();
     }
+
+    public void resetExecutor(){
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+    public void startMining() {
+        scheduler.shutdown();
+        this.resetExecutor();
+        System.out.println("Starting to mine new blocks...");
+        scheduler.scheduleWithFixedDelay(this, 0, 3L, TimeUnit.SECONDS);
+    }
+
+    public void stopMining() {
+        System.out.println("Stopping to mine new blocks...");
+        scheduler.shutdown();
+      //  this.resetExecutor();
+    }
+
+    public void flipSwitch(){
+        if(scheduler.isShutdown()){
+            this.startMining();
+        } else {
+            this.stopMining();
+        }
+    }
+
+    public boolean isActive(){
+        return scheduler.isShutdown();
+    }
+
+
+//
+//    void onStart(@Observes StartupEvent ev) {
+// //       scheduler.submit(this);
+//        scheduler.scheduleWithFixedDelay(this, 1L, 1L, TimeUnit.SECONDS);
+//    }
 
     void onStop(@Observes ShutdownEvent ev) {
         scheduler.shutdown();
@@ -61,23 +95,19 @@ public class Miner implements Runnable {
                 previousHash = chain.getLastBlock().getHash();
                 previousId = chain.getLastBlock().getId();
             } catch (Exception e) {
-                System.err.println("This is the genesis block!!!");
+                System.err.println("This is the genesis block.");
             }
             blockToMine.setId(previousId+1);
             blockToMine.setPreviousHash(previousHash);
 
-//            synchronized (b){
-            //    try{
             System.err.println("Mining block...");
-            blockToMine.mine(Main.BlockchainTool.difficulty);
+            blockToMine.mine(Runner.difficulty);
 
-            //}
-
-            List<Block> tmp = Lists.newArrayList(chain.getMined());
+            List<Block> tmp = Lists.newArrayList(chain.getAll());
             tmp.add(blockToMine);
-          //  System.out.println("TEMP CHAIN "+tmp);
-            if(BlockHelper.isChainValid(tmp, Main.BlockchainTool.difficulty)){
-                System.err.println("BLOCK VALID: "+blockToMine.getId());
+
+            if(BlockchainHelper.isChainValid(tmp, Runner.difficulty)){
+                System.err.println("Block ID "+blockToMine.getId()+ " is valid.");
                 chain.add(blockToMine);
                 storage.saveBlock(blockToMine);
                 transmissionPool.add(blockToMine);

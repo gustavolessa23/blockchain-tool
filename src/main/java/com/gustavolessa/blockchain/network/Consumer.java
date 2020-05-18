@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.jms.*;
+import java.rmi.ServerError;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,7 @@ public class Consumer implements Runnable {
     @Inject
     ConnectionFactory connectionFactory;
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
     private volatile String data;
 
@@ -41,9 +42,39 @@ public class Consumer implements Runnable {
         return data;
     }
 
-    void onStart(@Observes StartupEvent ev) {
- //       scheduler.submit(this);
-        scheduler.scheduleWithFixedDelay(this, 10L, 5L, TimeUnit.SECONDS);
+    public Consumer(){
+        this.resetExecutor();
+    }
+
+    public void resetExecutor(){
+       if (scheduler != null) scheduler.shutdown();
+
+       this.scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public void startListening() {
+        if (scheduler != null) scheduler.shutdown();
+        this.resetExecutor();
+        System.out.println("Starting to listen to new blocks...");
+        scheduler.scheduleWithFixedDelay(this, 0, 1L, TimeUnit.SECONDS);
+    }
+
+    public void stopListening() {
+        System.out.println("Stopping to send new blocks...");
+        scheduler.shutdown();
+       // resetExecutor();
+    }
+
+
+    public void flipSwitch(){
+        if(scheduler.isShutdown()){
+            this.startListening();
+        } else {
+            this.stopListening();
+        }
+    }
+    public boolean isActive(){
+        return scheduler.isShutdown();
     }
 
     void onStop(@Observes ShutdownEvent ev) {
@@ -60,28 +91,27 @@ public class Consumer implements Runnable {
                     return;
                 } else {
                     if (message != null) {
-                      //  System.out.println("TextMessage "+message.getText());
-
                         String retrieved = message.getText();
                         Gson gson = new Gson();
                         Object obj = gson.fromJson(retrieved, Block.class);
-                       // System.out.println("Object is "+obj.toString());
                         b = (Block) obj;
-                       // System.out.println("Transaction is "+t);
                     }
                 }
-                System.err.println("Received block: "+ b.toString());
+                System.err.println("Received block ID "+ b.getId());
 
-                if(BlockchainHelper.blockCanBeInserted(chain, b)){
-                    System.err.println("Received block can be inserted!");
-                    chain.add(b);
-                    storage.saveBlock(b);
+                if(!chain.contains(b)){
+                    if(BlockchainHelper.blockCanBeInserted(chain, b)){
+                        System.err.println("Received block can be inserted!");
+                        chain.add(b);
+                        storage.saveBlock(b);
+                    } else {
+                        System.err.println("Received block invalid");
+                    }
                 } else {
-                    System.err.println("Received block invalid");
+                    System.err.println("Received block is already in the blockchain.");
                 }
 
-            //    System.err.println("Is the transaction valid? "+ TransactionHelper.validateTransaction(t));
-            //    System.err.println("Is the block valid? "+ BlockHelper.isChainValid(t, Main.BlockchainTool.difficulty);
+
 
             }
         } catch (JMSException e) {

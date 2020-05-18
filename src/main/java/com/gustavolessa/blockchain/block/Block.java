@@ -47,10 +47,7 @@ public class Block {
                 nonce++;
                 hash = calculateHash();
             }
-            //  System.err.println("MINED: "+this);
-            System.err.println("Block mined.");
-       //     notify();
-
+            System.err.println("Block ID "+this.id+" mined.");
         return true;
     }
 

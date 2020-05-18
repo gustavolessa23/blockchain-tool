@@ -1,9 +1,10 @@
 package com.gustavolessa.blockchain.chain;
 
 import com.google.common.collect.Lists;
-import com.gustavolessa.blockchain.Main;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.block.BlockHelper;
+import com.gustavolessa.blockchain.services.Runner;
+import com.gustavolessa.blockchain.storage.StorageDAO;
 
 import java.util.List;
 
@@ -35,16 +36,23 @@ public class BlockchainHelper {
     }
 
     public static boolean blockCanBeInserted(Blockchain chain, Block b){
-        List<Block> tmp = Lists.newArrayList(chain.getMined());
+        List<Block> tmp = Lists.newArrayList(chain.getAll());
         tmp.add(b);
         //  System.out.println("TEMP CHAIN "+tmp);
-        if(isChainValid(tmp, Main.BlockchainTool.difficulty)){
-            System.err.println("BLOCK VALID: "+b.getId());
+        if(isChainValid(tmp, Runner.difficulty)){
+            System.err.println("Block ID "+b.getId()+" can be inserted.");
             return true;
         } else {
             System.err.println("Block invalid for the chain.");
             return false;
         }
+    }
+
+    public static void resetBlockchain(Blockchain blockchain, StorageDAO storage){
+        System.out.println("Resetting blockchain...");
+        blockchain.reset();
+        storage.clear();
+        storage.writeAll(blockchain.getAll());
     }
 
 }

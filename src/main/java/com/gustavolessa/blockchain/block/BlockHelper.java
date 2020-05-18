@@ -10,29 +10,6 @@ public class BlockHelper {
         return StringUtils.applySha256(info);
     }
 
-    public static boolean isChainValid(List<Block> blockchain, int difficulty){
-        Block current;
-        Block previous;
-
-        // iterate through chain and check hashes
-        for(int x = 1; x < blockchain.size(); x++){
-            current = blockchain.get(x);
-            previous = blockchain.get(x-1);
-
-            // check current block's previous hash reference with previous block's hash
-            // check calculated hash for current block
-            // check if difficulty was met
-            boolean isValid = (
-                            checkHashReference(current, previous) &&
-                            checkCalculatedHash(current) &&
-                            checkDifficulty(difficulty, current)
-                            );
-
-            if(!isValid) return false;
-        }
-        return true;
-    }
-
     public static boolean checkHashReference(Block current, Block previous) {
         if(!previous.getHash().equals(current.getPreviousHash())){
             System.err.println("Previous hash mismatch for block "+current.getHash()+".");
@@ -54,14 +31,10 @@ public class BlockHelper {
         StringBuilder sb = new StringBuilder(block.getPreviousHash());
         sb.append(block.getTimeStamp());
 
-//        for(int x = 0; x < data.size(); x++){
-//            sb.append(data.get(x));
-//        }
-//        sb.append(nonce);
-//        return BlockHelper.hash(sb.toString());
         for(int x = 0; x < block.getData().size(); x++){
             sb.append(block.getData().get(x));
         }
+
         sb.append(block.getNonce());
         String calculatedHash = BlockHelper.hash(sb.toString());
 
@@ -72,8 +45,6 @@ public class BlockHelper {
             return true;
         }
     }
-
-   // public static String calculateHash(Block)
 
     private BlockHelper(){}
 }

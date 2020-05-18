@@ -10,50 +10,53 @@ import java.util.List;
 @ApplicationScoped
 public class Blockchain implements Cloneable{
 
-    private List<Block> mined = new ArrayList<>();
+    private List<Block> blockchain = new ArrayList<>();
 
-    public List<Block> getMined() {
-        return mined;
+    public List<Block> getAll() {
+        return blockchain;
     }
 
 
     public Block getById(long id) throws Exception{
-        for(Block b: mined){
+        for(Block b: blockchain){
             if(b.getId() == id) return b;
         }
         throw new Exception();
     }
 
     public Block getLastBlock() throws Exception {
-        if(mined.isEmpty()) throw new Exception();
+        if(blockchain.isEmpty()) throw new Exception();
 
-        return mined.get(mined.size()-1);
+        return blockchain.get(blockchain.size()-1);
     }
 
     public void replace(Blockchain b){
-        this.mined = List.copyOf(b.getMined());
+        this.blockchain = List.copyOf(b.getAll());
         System.err.println("Blockchain replaced.");
     }
 
     public boolean add(Block b){
-        int sizeBefore = mined.size();
-        mined.add(b);
-        if(sizeBefore < mined.size()){
-            System.err.println("Block added: ID "+b.getId());
-            System.err.println("BLOCKCHAIN UPDATED! "+ this);
+        int sizeBefore = blockchain.size();
+        blockchain.add(b);
+        if(sizeBefore < blockchain.size()){
+            System.err.println("Block ID "+b.getId()+" added to the blockchain.");
             return true;
         } else {
-            System.err.println("Could not add block: ID "+b.getId());
+            System.err.println("Could not add block ID "+b.getId());
             return false;
         }
     }
 
+    public boolean contains(Block b){
+        return blockchain.contains(b);
+    }
+
     public int size(){
-        return mined.size();
+        return blockchain.size();
     }
 
     public Block get(int index){
-        return mined.get(index);
+        return blockchain.get(index);
     }
 
     @Override
@@ -70,5 +73,11 @@ public class Blockchain implements Cloneable{
     @Override
     public String toString() {
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+    }
+
+    public void reset(){
+        for(Block b : blockchain){
+            if(blockchain.indexOf(b) > 0) blockchain.remove(b);
+        }
     }
 }

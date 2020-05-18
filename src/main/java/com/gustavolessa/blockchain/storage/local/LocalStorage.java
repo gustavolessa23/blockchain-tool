@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.storage.StorageDAO;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
@@ -25,7 +26,7 @@ public class LocalStorage implements StorageDAO {
 
     static final Path path = Paths.get("blockdata");
     static String folder = "blockdata";
-    static String PATH = File.pathSeparatorChar + folder + File.pathSeparatorChar;
+//    static String PATH = File.pathSeparatorChar + folder + File.pathSeparatorChar;
 
 
     @Override
@@ -44,6 +45,7 @@ public class LocalStorage implements StorageDAO {
 
     @Override
     public List<Block> readAll() {
+        System.out.println("Reading all blocks from storage...");
         try (Stream<Path> walk = Files.walk(path)) {
 
             List<Block> result = walk.filter(Files::isRegularFile)
@@ -60,6 +62,17 @@ public class LocalStorage implements StorageDAO {
         return null;
     }
 
+    @Override
+    public void clear() {
+        try (Stream<Path> walk = Files.walk(path)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Block getBlock(Path path){
         Gson gson = new Gson();
         try {
@@ -71,7 +84,7 @@ public class LocalStorage implements StorageDAO {
 
             return block;
         } catch (JsonSyntaxException e) {
-            System.err.println("JsonSyntaxException when reading "+ path.toString());
+            //System.err.println("JsonSyntaxException when reading "+ path.toString());
             return null;
         } catch (FileNotFoundException e) {
             System.err.println("File not found "+ path.toString());
@@ -92,5 +105,11 @@ public class LocalStorage implements StorageDAO {
     @Override
     public Block findByHash(String hash) {
         return null;
+    }
+
+    @Override
+    public void writeAll(List<Block> blocks) {
+        System.out.println("Writing blocks to storage...");
+        blocks.stream().forEach(b -> saveBlock(b));
     }
 }

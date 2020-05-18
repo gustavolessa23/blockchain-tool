@@ -22,23 +22,24 @@ public class SampleBlockGenerator {
     @Inject
     Blockchain blockchain;
 
-    public synchronized void generateSampleBlockchainWithPool(){
-
+    public void generateGenesisBlock(){
         // Generate genesis block
         System.err.println("Generating Genesis block...");
         Transaction t0 = new Transaction(1,"Gustavo","GENESIS");
         Block genesis = new Block(Arrays.asList(t0),"0", 0);
-//        genesis.mine(difficulty);
         miningPool.add(genesis);
 
         while(blockchain.size()==0){
             try {
                 Thread.sleep(1300);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
         }
+    }
 
+    public void createSampleTransactions(){
         // Sample transactions
         Transaction t1 = new Transaction(1,"Mark","Object Oriented Constructs");
         Transaction t2 = new Transaction(1,"Greg","Cloud Virtualization Frameworks");
@@ -50,8 +51,10 @@ public class SampleBlockGenerator {
         transactionPool.add(t2);
         transactionPool.add(t3);
         transactionPool.add(t4);
-        System.out.println("BLOCK SIZEEEEEEE "+blockchain.size());
 
+    }
+
+    public void mineBlocks(){
         // Get two and add to a new block
         List<Transaction> firstTwo = transactionPool.getMany(2);
         Block b1 = new Block(
@@ -66,12 +69,18 @@ public class SampleBlockGenerator {
                 blockchain.get(blockchain.size()-1).getHash(),
                 blockchain.get(blockchain.size()-1).getId());
         miningPool.add(b2);
-        notify();
-      //  b1.mine(difficulty);
-    //    blockPool.add(b1);
-    //    blockchain.add(b1);
-
-//            ArrayList<Block> blockchain = new ArrayList<>(Arrays.asList(genesis));
-  //      return blockchain;
     }
+
+    public synchronized void generateSampleBlockchainWithPool(){
+
+        generateGenesisBlock();
+
+        createSampleTransactions();
+
+        mineBlocks();
+
+        notify();
+
+    }
+
 }

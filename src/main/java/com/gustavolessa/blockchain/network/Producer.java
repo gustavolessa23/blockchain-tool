@@ -29,10 +29,43 @@ public class Producer implements Runnable {
 
     private Block b;
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
+    //private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    void onStart(@Observes StartupEvent ev) {
-        scheduler.scheduleWithFixedDelay(this, 2L, 5L, TimeUnit.SECONDS);
+
+    public Producer() {
+        this.resetExecutor();
+    }
+
+    public void resetExecutor(){
+        if (scheduler != null) scheduler.shutdown();
+
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public void startSending(){
+        if (scheduler != null) scheduler.shutdown();
+        resetExecutor();
+            System.out.println("Starting to send new blocks...");
+            scheduler.scheduleWithFixedDelay(this, 1L, 2L, TimeUnit.SECONDS);
+    }
+
+    public void stopSending(){
+        System.out.println("Stopping to send new blocks...");
+        scheduler.shutdown();
+    //    this.resetExecutor();
+    }
+
+    public void flipSwitch(){
+        if(scheduler.isShutdown()){
+            startSending();
+        } else {
+            stopSending();
+        }
+    }
+
+    public boolean isActive(){
+        return scheduler.isShutdown();
     }
 
     void onStop(@Observes ShutdownEvent ev) {
@@ -42,26 +75,14 @@ public class Producer implements Runnable {
     @Override
     public void run() {
         if(!pool.isEmpty()){
-
             b = pool.getFirst();
-
-                try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-                    System.out.println("Sending block = "+ b.toString());
-                    TextMessage message = context.createTextMessage(b.toString());
-//                    System.out.println("TextMessage "+message.getText());
-//                    Queue queue = context.createQueue("transactions");
-//                    JMSProducer producer = context.createProducer();
-                  //  producer.send(context.createQueue("transactions"), message);
-                    context.createProducer().send(context.createQueue("blocks"),message);
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-//            toSend.forEach(e -> System.out.println("Trying to send "+e.toString()));
-//            try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-//                context.createProducer()..send(context.createQueue("transactions"), toSend.toString());
-//            } catch(Exception e){
-//                e.printStackTrace();
-//            }
+            try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
+                System.out.println("Sending block ID "+ b.getId());
+                TextMessage message = context.createTextMessage(b.toString());
+                context.createProducer().send(context.createQueue("blocks"),message);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 }
