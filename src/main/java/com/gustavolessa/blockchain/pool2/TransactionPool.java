@@ -1,7 +1,7 @@
-package com.gustavolessa.blockchain.pool;
+package com.gustavolessa.blockchain.pool2;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.util.ISO8601Utils;
+import com.gustavolessa.blockchain.pool.Pool;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -65,8 +65,6 @@ public class TransactionPool implements Pool {
 
     @Override
     public String toString() {
-     //   return new GsonBuilder().setPrettyPrinting().create().toJson(getQueue());
-
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 }

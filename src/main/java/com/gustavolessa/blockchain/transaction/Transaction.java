@@ -16,11 +16,18 @@ public class Transaction implements Serializable {
     private String message;
     private long timeStamp;
 
+    public Transaction(){
+
+    }
 
     public Transaction(int type, String author, String message) {
         this.type = type;
         this.author = author;
         this.message = message;
+        this.init();
+    }
+
+    private void init() {
         this.timeStamp = new Date().getTime();
         this.hash = TransactionHelper.calculateHash(this);
     }
@@ -55,5 +62,29 @@ public class Transaction implements Serializable {
 
     public String getHash() {
         return this.hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+        this.init();
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+        this.init();
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+        this.init();
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+        this.hash = TransactionHelper.calculateHash(this);
     }
 }
