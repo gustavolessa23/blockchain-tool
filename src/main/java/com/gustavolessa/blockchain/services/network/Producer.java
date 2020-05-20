@@ -72,7 +72,7 @@ public class Producer implements Runnable {
             try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
                 System.out.println("Sending block ID " + b.getId());
                 TextMessage message = context.createTextMessage(b.toString());
-                context.createProducer().send(context.createQueue("blocks"), message);
+                context.createProducer().send(context.createTopic("blocks"), message);
             } catch (Exception e) {
                 e.printStackTrace();
             }

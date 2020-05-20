@@ -47,7 +47,29 @@ public class BlockHelper {
     }
 
     public static boolean checkCalculatedHash(Block block) {
-        StringBuilder sb = new StringBuilder(block.getPreviousHash());
+//        StringBuilder sb = new StringBuilder(""+block.getId());
+//        sb.append(block.getPreviousHash());
+//        sb.append(block.getTimeStamp());
+//
+//        for (int x = 0; x < block.getData().size(); x++) {
+//            sb.append(block.getData().get(x));
+//        }
+//
+//        sb.append(block.getNonce());
+//        String calculatedHash = BlockHelper.hash(sb.toString());
+
+        if (!block.getHash().equals(calculateHash(block))) {
+            System.err.println("Calculated hash mismatch for block " + block.getHash());
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static String calculateHash(Block block){
+        StringBuilder sb = new StringBuilder();
+        sb.append(block.getId());
+        sb.append(block.getPreviousHash());
         sb.append(block.getTimeStamp());
 
         for (int x = 0; x < block.getData().size(); x++) {
@@ -55,14 +77,7 @@ public class BlockHelper {
         }
 
         sb.append(block.getNonce());
-        String calculatedHash = BlockHelper.hash(sb.toString());
-
-        if (!block.getHash().equals(calculatedHash)) {
-            System.err.println("Calculated hash mismatch for block " + block.getHash());
-            return false;
-        } else {
-            return true;
-        }
+        return BlockHelper.hash(sb.toString());
     }
 
     private BlockHelper() {

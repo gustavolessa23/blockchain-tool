@@ -59,7 +59,7 @@ public class BlockchainHelper {
         System.out.println("Resetting blockchain...");
         blockchain.reset();
         storage.clear();
-        storage.writeAll(blockchain.getAll());
+       // storage.writeAll(blockchain.getAll());
     }
 
 }

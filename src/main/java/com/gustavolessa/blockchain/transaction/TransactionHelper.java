@@ -22,4 +22,15 @@ public class TransactionHelper {
         sb.append(t.getTimeStamp());
         return TransactionHelper.hash(sb.toString());
     }
+
+    public static boolean validateTransaction(Transaction t){
+
+        boolean ans = t.getHash().equals(calculateHash(t));
+        if(ans){
+            System.out.println("Transaction is valid.");
+        } else {
+            System.out.println("Transaction is not valid.");
+        }
+        return ans;
+    }
 }

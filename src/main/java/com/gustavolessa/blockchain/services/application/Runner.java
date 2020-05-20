@@ -6,7 +6,6 @@ import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.chain.BlockchainHelper;
 import com.gustavolessa.blockchain.chain.SampleBlockGenerator;
 import com.gustavolessa.blockchain.pool.MiningPool;
-import com.gustavolessa.blockchain.pool.TransactionPool;
 import com.gustavolessa.blockchain.pool.TransmissionPool;
 import com.gustavolessa.blockchain.services.network.Consumer;
 import com.gustavolessa.blockchain.services.network.Producer;
@@ -88,10 +87,6 @@ public class Runner {
     }
 
 
-    public boolean isInit() {
-        return init;
-    }
-
     public void runTest() {
 
         if (!init) {
@@ -109,7 +104,7 @@ public class Runner {
         generator.createSampleTransactions();
 //
         try {
-            System.out.println("Wait: 8");
+         //   System.out.println("Wait: 8");
             Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,7 +112,6 @@ public class Runner {
         generator.mineBlocks();
 
         try {
-            System.out.println("WAITING");
             Thread.sleep(12000);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -129,6 +123,7 @@ public class Runner {
     public void sendBlockFromOutside() {
         System.out.println("Creating block to send without adding to the chain...");
         Transaction t2 = new Transaction(1, "Jenny", "Programming");
+
         Block toSend = new Block(Arrays.asList(t2));
         System.out.println("JENNY " + toSend);
 
@@ -138,20 +133,22 @@ public class Runner {
             previousHash = chain.getLastBlock().getHash();
             previousId = chain.getLastBlock().getId();
         } catch (Exception e) {
-            System.err.println("Shouldn't read this!!!");
+//            System.err.println("Shouldn't read this!!!");
         }
         toSend.setId(previousId + 1);
         toSend.setPreviousHash(previousHash);
-        System.err.println("Mining block...");
+
+        System.err.println("Mining fake block...");
         if (toSend.mine(Runner.difficulty)) {
+
+            System.out.println("Changing the block ID...");
+            toSend.setId(999);
+
             List<Block> tmp = new ArrayList<>(chain.getAll());
             tmp.add(toSend);
-            if (BlockchainHelper.isChainValid(tmp, Runner.difficulty)) {
-                System.err.println("Block ID " + toSend.getId() + " is valid.");
-                transmissionPool.add(toSend);
-            } else {
-                System.err.println("Block invalid for the chain.");
-            }
+            transmissionPool.add(toSend);
+
+
         }
     }
 

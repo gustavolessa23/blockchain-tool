@@ -3,8 +3,6 @@ package com.gustavolessa.blockchain.chain;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.pool.MiningPool;
 import com.gustavolessa.blockchain.pool.TransactionPool;
-import com.gustavolessa.blockchain.pool.TransmissionPool;
-import com.gustavolessa.blockchain.block.Miner;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,8 +13,6 @@ import java.util.List;
 @ApplicationScoped
 public class SampleBlockGenerator {
 
-    @Inject
-    TransmissionPool transmissionPool;
 
     @Inject
     MiningPool miningPool;
@@ -27,37 +23,6 @@ public class SampleBlockGenerator {
     @Inject
     Blockchain blockchain;
 
-    @Inject
-    Miner miner;
-
-//    public static MiningPool generateGenesisBlock(MiningPool pool) {
-//        // Generate genesis block
-//        System.err.println("Generating Genesis block...");
-//        Transaction t0 = new Transaction(1, "GENESIS", "GENESIS BLOCK15");
-//        Block genesis = new Block(Arrays.asList(t0), "0", 0);
-//
-////        System.out.println("Antes" +blockchain.size());
-////        int previousSize = miningPool.getSize();
-//        if (pool.add(genesis)) {
-////            while(miningPool.getSize() == previousSize){
-//            //miner.run();
-//            try {
-//                System.out.println("Waiting 15 seconds...");
-//                Thread.sleep(15000);
-//                //Thread.sleep(200);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-////            }
-//            // System.out.println("NOT SAME SIZE");
-//            //     System.out.println("Meio" +blockchain.size());
-//
-//            //  notify();
-//            //  Block mined = blockchain.get(0);
-//            //   transmissionPool.add(mined);
-//        }
-//        return pool;
-//    }
 
     public synchronized void generateGenesisBlock() {
         // Generate genesis block
@@ -95,7 +60,7 @@ public class SampleBlockGenerator {
         miningPool.add(b1);
 
         try {
-            System.out.println("Waiting three seconds.");
+          //  System.out.println("Waiting three seconds.");
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -110,28 +75,11 @@ public class SampleBlockGenerator {
 
 
         try {
-            System.out.println("Waiting three seconds.");
+        //    System.out.println("Waiting three seconds.");
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public void generateSampleBlockchainWithPool() {
-
-
-        //int temp =
-//        synchronized (this){
-        generateGenesisBlock();
-
-        createSampleTransactions();
-
-        mineBlocks();
-
-//            this.notify();
-
-//        }
-
     }
 
 }

@@ -73,7 +73,7 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
         try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createQueue("blocks"));
+            JMSConsumer consumer = context.createConsumer(context.createTopic("blocks"));
             while (true) {
                 TextMessage message = (TextMessage) consumer.receive();
                 if (message == null) {
