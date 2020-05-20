@@ -1,4 +1,4 @@
-package com.gustavolessa.blockchain.services;
+package com.gustavolessa.blockchain.controller;
 
 import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.pool.MiningPool;
@@ -28,39 +28,33 @@ public class BlockchainController {
     TransmissionPool transmissionPool;
 
     @GET
-    public String getBlockchain(){
+    public String getBlockchain() {
         return chain.toString();
     }
 
     @GET
     @Path("/mining")
-    public String getMining(){
+    public String getMining() {
         return miningPool.toString();
     }
 
     @GET
     @Path("/transmitting")
-    public String getTransmitting(){
+    public String getTransmitting() {
         return transmissionPool.toString();
     }
 
     @GET
     @Path("/transactions")
-    public String getTransactions(){
+    public String getTransactions() {
         return transactionPool.toString();
     }
 
     @POST
     @Path("/transactions")
-    public boolean addTransaction(Transaction t){
+    public boolean addTransaction(Transaction t) {
         return transactionPool.add(t);
     }
-
-
-
-
-
-
 
 
 }

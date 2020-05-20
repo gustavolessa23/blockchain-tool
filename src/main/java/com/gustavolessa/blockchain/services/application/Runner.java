@@ -1,22 +1,22 @@
-package com.gustavolessa.blockchain.services;
+package com.gustavolessa.blockchain.services.application;
 
-import com.google.common.collect.Lists;
-import com.gustavolessa.blockchain.Miner;
 import com.gustavolessa.blockchain.block.Block;
-import com.gustavolessa.blockchain.block.BlockHelper;
+import com.gustavolessa.blockchain.block.Miner;
 import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.chain.BlockchainHelper;
-import com.gustavolessa.blockchain.network.Consumer;
-import com.gustavolessa.blockchain.network.Producer;
+import com.gustavolessa.blockchain.chain.SampleBlockGenerator;
 import com.gustavolessa.blockchain.pool.MiningPool;
 import com.gustavolessa.blockchain.pool.TransactionPool;
 import com.gustavolessa.blockchain.pool.TransmissionPool;
+import com.gustavolessa.blockchain.services.network.Consumer;
+import com.gustavolessa.blockchain.services.network.Producer;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 import com.gustavolessa.blockchain.transaction.Transaction;
 import io.quarkus.runtime.Quarkus;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,9 +34,6 @@ public class Runner {
 
     @Inject
     Blockchain chain;
-
-    @Inject
-    TransactionPool transactionPool;
 
     @Inject
     TransmissionPool transmissionPool;
@@ -62,7 +59,7 @@ public class Runner {
         init = true;
     }
 
-    public void readOrGenerateGenesis(){
+    public void readOrGenerateGenesis() {
         System.out.println("Reading saved blocks.");
         List<Block> fromStorage = storage.readAll();
 
@@ -84,19 +81,20 @@ public class Runner {
             if (!BlockchainHelper.isChainValid(chain.getAll(), difficulty)) {
                 System.err.println("Blockchain invalid --> resetting");
                 chain.reset();
-                System.out.println("Generating sample blockchain.");
-                generator.generateSampleBlockchainWithPool();
+                storage.clear();
+                generator.generateGenesisBlock();
             }
         }
     }
 
 
-    public boolean isInit(){
+    public boolean isInit() {
         return init;
     }
 
-    public void runTest(){
-        if(!init){
+    public void runTest() {
+
+        if (!init) {
             init();
             try {
                 Thread.sleep(3000);
@@ -104,11 +102,33 @@ public class Runner {
                 e.printStackTrace();
             }
         }
+
+        System.out.println("Generating sample blockchain.");
+        generator.generateGenesisBlock();
+
+        generator.createSampleTransactions();
+//
+        try {
+            System.out.println("Wait: 8");
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        generator.mineBlocks();
+
+        try {
+            System.out.println("WAITING");
+            Thread.sleep(12000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         sendBlockFromOutside();
     }
-    public void sendBlockFromOutside(){
+
+    public void sendBlockFromOutside() {
         System.out.println("Creating block to send without adding to the chain...");
-        Transaction t2 = new Transaction(1,"Jenny","Programming");
+        Transaction t2 = new Transaction(1, "Jenny", "Programming");
         Block toSend = new Block(Arrays.asList(t2));
         System.out.println("JENNY " + toSend);
 
@@ -120,14 +140,14 @@ public class Runner {
         } catch (Exception e) {
             System.err.println("Shouldn't read this!!!");
         }
-        toSend.setId(previousId+1);
+        toSend.setId(previousId + 1);
         toSend.setPreviousHash(previousHash);
         System.err.println("Mining block...");
-        if(toSend.mine(Runner.difficulty)){
-            List<Block> tmp = Lists.newArrayList(chain.getAll());
+        if (toSend.mine(Runner.difficulty)) {
+            List<Block> tmp = new ArrayList<>(chain.getAll());
             tmp.add(toSend);
-            if(BlockchainHelper.isChainValid(tmp, Runner.difficulty)){
-                System.err.println("Block ID "+toSend.getId()+ " is valid.");
+            if (BlockchainHelper.isChainValid(tmp, Runner.difficulty)) {
+                System.err.println("Block ID " + toSend.getId() + " is valid.");
                 transmissionPool.add(toSend);
             } else {
                 System.err.println("Block invalid for the chain.");
@@ -142,5 +162,6 @@ public class Runner {
         miner.stopMining();
         Quarkus.asyncExit();
     }
+
 
 }

@@ -4,16 +4,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Transaction implements Serializable {
-//    public String hash;
-//    public PublicKey sender;
-//    public PublicKey recipient;
+
     private String hash;
     private int type;
     private String author;
     private String message;
     private long timeStamp;
 
-    public Transaction(){
+    public Transaction() {
 
     }
 
@@ -29,7 +27,7 @@ public class Transaction implements Serializable {
         this.hash = TransactionHelper.calculateHash(this);
     }
 
-    public String calculateHash(){
+    public String calculateHash() {
         StringBuilder sb = new StringBuilder(type);
         sb.append(author);
         sb.append(message);
@@ -37,7 +35,8 @@ public class Transaction implements Serializable {
 
         return TransactionHelper.hash(sb.toString());
     }
-    public String toString(){
+
+    public String toString() {
         return TransactionHelper.toString(this);
     }
 

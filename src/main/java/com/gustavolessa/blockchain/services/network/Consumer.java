@@ -1,4 +1,4 @@
-package com.gustavolessa.blockchain.network;
+package com.gustavolessa.blockchain.services.network;
 
 import com.google.gson.Gson;
 import com.gustavolessa.blockchain.block.Block;
@@ -6,13 +6,11 @@ import com.gustavolessa.blockchain.chain.Blockchain;
 import com.gustavolessa.blockchain.chain.BlockchainHelper;
 import com.gustavolessa.blockchain.storage.local.LocalStorage;
 import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.jms.*;
-import java.rmi.ServerError;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,8 +26,6 @@ public class Consumer implements Runnable {
 
     private ScheduledExecutorService scheduler;
 
-    private volatile String data;
-
     private volatile Block b;
 
     @Inject
@@ -38,18 +34,14 @@ public class Consumer implements Runnable {
     @Inject
     private Blockchain chain;
 
-    public String getData() {
-        return data;
-    }
-
-    public Consumer(){
+    public Consumer() {
         this.resetExecutor();
     }
 
-    public void resetExecutor(){
-       if (scheduler != null) scheduler.shutdown();
+    public void resetExecutor() {
+        if (scheduler != null) scheduler.shutdown();
 
-       this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void startListening() {
@@ -62,19 +54,16 @@ public class Consumer implements Runnable {
     public void stopListening() {
         System.out.println("Stopping to listen to new blocks...");
         scheduler.shutdown();
-       // resetExecutor();
+        // resetExecutor();
     }
 
 
-    public void flipSwitch(){
-        if(scheduler.isShutdown()){
+    public void flipSwitch() {
+        if (scheduler.isShutdown()) {
             this.startListening();
         } else {
             this.stopListening();
         }
-    }
-    public boolean isActive(){
-        return scheduler.isShutdown();
     }
 
     void onStop(@Observes ShutdownEvent ev) {
@@ -86,7 +75,7 @@ public class Consumer implements Runnable {
         try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
             JMSConsumer consumer = context.createConsumer(context.createQueue("blocks"));
             while (true) {
-                TextMessage message = (TextMessage)consumer.receive();
+                TextMessage message = (TextMessage) consumer.receive();
                 if (message == null) {
                     return;
                 } else {
@@ -97,10 +86,11 @@ public class Consumer implements Runnable {
                         b = (Block) obj;
                     }
                 }
-                System.err.println("Received block ID "+ b.getId());
+                System.err.println("Received block ID " + b.getId());
 
-                if(!chain.contains(b)){
-                    if(BlockchainHelper.blockCanBeInserted(chain, b)){
+
+                if (chain.getByHash(b.getHash()) == null) {
+                    if (BlockchainHelper.blockCanBeInserted(chain, b)) {
                         System.err.println("Received block can be inserted!");
                         chain.add(b);
                         storage.saveBlock(b);
@@ -110,9 +100,6 @@ public class Consumer implements Runnable {
                 } else {
                     System.err.println("Received block is already in the blockchain.");
                 }
-
-
-
             }
         } catch (JMSException e) {
             throw new RuntimeException(e);

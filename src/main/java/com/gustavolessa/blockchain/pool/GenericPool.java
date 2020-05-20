@@ -20,5 +20,5 @@ public interface GenericPool<T> {
     boolean isEmpty();
 
     T readFirst();
-    
+
 }

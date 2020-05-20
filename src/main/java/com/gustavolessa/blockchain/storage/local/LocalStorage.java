@@ -5,13 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.storage.StorageDAO;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,31 +25,29 @@ import java.util.stream.Stream;
 public class LocalStorage implements StorageDAO {
 
     static Path path;
-    static String folder = "blockdata";
-//    static String PATH = File.pathSeparatorChar + folder + File.pathSeparatorChar;
 
-
-    public LocalStorage(){
+    public LocalStorage() {
         this.getPath();
     }
 
-    public void getPath(){
-        try{
+    public void getPath() {
+        try {
             path = Paths.get("blockdata");
-            Files.createDirectory(path);
+            if (Files.notExists(path)) Files.createDirectory(path);
+
         } catch (IOException e) {
-          //  e.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
+
     @Override
     public int saveBlock(Block block) {
         try {
-            Files.createDirectory(path);
+            getPath();
             String blockJson = new GsonBuilder().setPrettyPrinting().create().toJson(block);
             Path returned = Files.write(path.resolve(block.getHash()), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-            System.out.println("Block saved at: "+returned);
+            System.out.println("Block saved at: " + returned);
             return 1;
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
@@ -86,10 +86,9 @@ public class LocalStorage implements StorageDAO {
         }
     }
 
-    private Block getBlock(Path path){
+    private Block getBlock(Path path) {
         Gson gson = new Gson();
         try {
-          //  System.out.println("Trying: " + path.toString());
             byte[] content = Files.readAllBytes(path);
             Object obj = gson.fromJson(new String(content), Block.class);
             Block block = (Block) obj;
@@ -97,13 +96,12 @@ public class LocalStorage implements StorageDAO {
 
             return block;
         } catch (JsonSyntaxException e) {
-            //System.err.println("JsonSyntaxException when reading "+ path.toString());
             return null;
         } catch (FileNotFoundException e) {
-            System.err.println("File not found "+ path.toString());
+            System.err.println("File not found " + path.toString());
             return null;
         } catch (IOException e) {
-            System.err.println("IOException when reading "+ path.toString());
+            System.err.println("IOException when reading " + path.toString());
             e.printStackTrace();
             return null;
         }

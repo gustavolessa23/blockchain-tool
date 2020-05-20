@@ -24,7 +24,7 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.1
 
 ARG JAVA_PACKAGE=java-11-openjdk-headless
-ARG RUN_JAVA_VERSION=1.3.5
+ARG RUN_JAVA_VERSION=1.3.7
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
@@ -37,9 +37,11 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && chown 1001 /deployments \
     && chmod "g+rwX" /deployments \
     && chown 1001:root /deployments \
-    && curl https://repo1.maven.org/maven2/io/fabric8/run-java-sh/${RUN_JAVA_VERSION}/run-java-sh-${RUN_JAVA_VERSION}-sh.sh -o /deployments/run-java.sh \
+    && curl https://uc4beff3437dacd14d0eb1b2ce54.dl.dropboxusercontent.com/cd/0/get/A4FSoxyi15yk4zoTCyBMlk5FknDxm6GeIV-ewVjfh4vY2qlDYlNkqHOoZJbJ_Ko1lvdJAWYCQEFUBAaVLvWNBueDkOi_UGEUHweu8pRDAWCKAh0O4Ej5Spg6tRPBTgcZjoo/file?_download_id=6143923222709331504503876065881192143249118279713771060753204418&_notify_domai
+ -L -o  /deployments/run-java.sh \
     && chown 1001 /deployments/run-java.sh \
     && chmod 540 /deployments/run-java.sh \
+    && sed -i -e '1i#!/bin/sh\' /deployments/run-java.sh \
     && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/lib/security/java.security
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.

@@ -1,7 +1,6 @@
 package com.gustavolessa.blockchain.pool;
 
 import com.google.gson.GsonBuilder;
-import com.gustavolessa.blockchain.block.Block;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,9 +8,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public abstract class AbstractQueuePool<T> implements GenericPool<T>{
+public abstract class AbstractQueuePool<T> implements GenericPool<T> {
 
-    private Queue<T> pool = new ConcurrentLinkedQueue<>();
+    Queue<T> pool;
+
+    public AbstractQueuePool() {
+        pool = new ConcurrentLinkedQueue<>();
+    }
 
     @Override
     public String toString() {
@@ -31,7 +34,7 @@ public abstract class AbstractQueuePool<T> implements GenericPool<T>{
     @Override
     public List<T> getMany(int n) {
         List<T> list = new ArrayList<>();
-        for(int x = 1; x <= n; x++){
+        for (int x = 1; x <= n; x++) {
             list.add(pool.poll());
         }
         return list;
@@ -40,7 +43,7 @@ public abstract class AbstractQueuePool<T> implements GenericPool<T>{
     @Override
     public List<T> getAll() {
         List<T> list = new ArrayList<>();
-        while(!pool.isEmpty()){
+        while (!pool.isEmpty()) {
             list.add(pool.poll());
         }
         return list;
@@ -50,7 +53,7 @@ public abstract class AbstractQueuePool<T> implements GenericPool<T>{
     public List<T> readMany(int n) {
         List<T> tmp = new ArrayList<>(pool);
         Collections.reverse(tmp);
-        return tmp.subList(0, n-1);
+        return tmp.subList(0, n - 1);
     }
 
     @Override
