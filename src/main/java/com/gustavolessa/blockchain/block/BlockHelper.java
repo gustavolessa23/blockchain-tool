@@ -46,17 +46,12 @@ public class BlockHelper {
         return true;
     }
 
+    /**
+     * Recalculates the block's hash and compares it to the information present in the block.
+     * @param block
+     * @return
+     */
     public static boolean checkCalculatedHash(Block block) {
-//        StringBuilder sb = new StringBuilder(""+block.getId());
-//        sb.append(block.getPreviousHash());
-//        sb.append(block.getTimeStamp());
-//
-//        for (int x = 0; x < block.getData().size(); x++) {
-//            sb.append(block.getData().get(x));
-//        }
-//
-//        sb.append(block.getNonce());
-//        String calculatedHash = BlockHelper.hash(sb.toString());
 
         if (!block.getHash().equals(calculateHash(block))) {
             System.err.println("Calculated hash mismatch for block " + block.getHash());
@@ -66,6 +61,11 @@ public class BlockHelper {
         }
     }
 
+    /**
+     * Calculates the hash of a block.
+     * @param block
+     * @return hash of the block
+     */
     public static String calculateHash(Block block){
         StringBuilder sb = new StringBuilder();
         sb.append(block.getId());
@@ -80,6 +80,9 @@ public class BlockHelper {
         return BlockHelper.hash(sb.toString());
     }
 
+    /**
+     * Private constructor to avoid class instantiation.
+     */
     private BlockHelper() {
     }
 }

@@ -2,6 +2,10 @@ package com.gustavolessa.blockchain.pool;
 
 import java.util.List;
 
+/**
+ * Generic interface to create a pool of any object using any data structure.
+ * @param <T>
+ */
 public interface GenericPool<T> {
     boolean add(T t);
 

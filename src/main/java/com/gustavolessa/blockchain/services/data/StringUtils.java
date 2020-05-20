@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/**
+ * Helper class responsible for hashing strings.
+ */
 public class StringUtils {
     public static String prettify(String input) {
         return new GsonBuilder().setPrettyPrinting().create().toJson(input);

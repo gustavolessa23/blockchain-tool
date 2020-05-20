@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
+/**
+ * Performs operations related to the overall system.
+ */
 @ApplicationScoped
 public class Runner {
 
@@ -38,9 +41,6 @@ public class Runner {
     TransmissionPool transmissionPool;
 
     @Inject
-    MiningPool miningPool;
-
-    @Inject
     Miner miner;
 
     @Inject
@@ -51,6 +51,7 @@ public class Runner {
 
     boolean init = false;
 
+    // initialise
     public void init() {
         miner.startMining();
         producer.startSending();
@@ -58,13 +59,19 @@ public class Runner {
         init = true;
     }
 
+    /**
+     * Read blocks from storage or create new genesis.
+     */
     public void readOrGenerateGenesis() {
         System.out.println("Reading saved blocks.");
         List<Block> fromStorage = storage.readAll();
 
+        // if storage is empty
         if (fromStorage.isEmpty()) {
             System.out.println("No blocks found.");
             generator.generateGenesisBlock();
+
+        // if storage is not empty
         } else {
             System.err.println("Reading blocks from storage.");
             for (Block b : fromStorage) {
@@ -77,6 +84,8 @@ public class Runner {
                     e.printStackTrace();
                 }
             }
+
+            // if block is invalid
             if (!BlockchainHelper.isChainValid(chain.getAll(), difficulty)) {
                 System.err.println("Blockchain invalid --> resetting");
                 chain.reset();
@@ -86,7 +95,9 @@ public class Runner {
         }
     }
 
-
+    /**
+     * Method responsible for generating and adding the sample blockchain.
+     */
     public void runTest() {
 
         if (!init) {
@@ -99,27 +110,30 @@ public class Runner {
         }
 
         System.out.println("Generating sample blockchain.");
-        generator.generateGenesisBlock();
+        generator.generateGenesisBlock(); // create genesis block
 
-        generator.createSampleTransactions();
+        generator.createSampleTransactions(); // create sample transactions
 //
-        try {
+        try {                                   // wait for the block to be mined
          //   System.out.println("Wait: 8");
             Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        generator.mineBlocks();
+        generator.mineSampleBlocks();           // mine two other blocks
 
-        try {
+        try {                                   // wait for them to be mined
             Thread.sleep(12000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        sendBlockFromOutside();
+        sendBlockFromOutside();                 // perform an attack by sending an invalid block over the network
     }
 
+    /**
+     * Sends an invalid block from outside the network.
+     */
     public void sendBlockFromOutside() {
         System.out.println("Creating block to send without adding to the chain...");
         Transaction t2 = new Transaction(1, "Jenny", "Programming");
@@ -152,6 +166,9 @@ public class Runner {
         }
     }
 
+    /**
+     * Method to stop the services and quit the application.
+     */
     public void exitApplication() {
         System.err.println("Shutting down Blockchain Demonstration Tool");
         consumer.stopListening();

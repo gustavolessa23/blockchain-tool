@@ -56,19 +56,6 @@ public abstract class Menu {
         for (String s : options) this.options.add(s);
     }
 
-    /**
-     * This method gets an option from the user, validates it and return the option.
-     *
-     * @param options
-     * @return
-     */
-    protected int chooseOption(List options) {
-        for (int x = 0; x < options.size(); x++) {
-            System.out.println((x + 1) + " - " + options.get(x));
-        }
-        System.out.println("Please choose an option: ");
-        return (DataValidation.checkForInt(in, 1, options.size())) - 1;
-    }
 
     /**
      * This method displays the menu options on CLI.

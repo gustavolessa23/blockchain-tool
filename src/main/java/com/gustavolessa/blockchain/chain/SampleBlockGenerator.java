@@ -10,6 +10,9 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Generates sample information for the blockchain.
+ */
 @ApplicationScoped
 public class SampleBlockGenerator {
 
@@ -23,7 +26,9 @@ public class SampleBlockGenerator {
     @Inject
     Blockchain blockchain;
 
-
+    /**
+     * Generate genesis block, the first block of the chain.
+     */
     public synchronized void generateGenesisBlock() {
         // Generate genesis block
         System.err.println("Generating Genesis block...");
@@ -34,6 +39,9 @@ public class SampleBlockGenerator {
 
     }
 
+    /**
+     * Create sample transactions.
+     */
     public void createSampleTransactions() {
         // Sample transactions
         Transaction t1 = new Transaction(1, "Mark", "Object Oriented Constructs");
@@ -49,7 +57,10 @@ public class SampleBlockGenerator {
 
     }
 
-    public void mineBlocks() {
+    /**
+     * Creates sample blocks and adds them to the mining pool.
+     */
+    public void mineSampleBlocks() {
 
         // Get two and add to a new block
         List<Transaction> firstTwo = transactionPool.getMany(2);

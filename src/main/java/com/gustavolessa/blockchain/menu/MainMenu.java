@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 /**
- * Main Menu Template
+ * Main Menu of the system
  *
  * @author Gustavo Lessa
  */
@@ -54,14 +54,14 @@ public class MainMenu extends Menu {
     @Inject
     Runner runner;
 
-    /**
-     * Basic constructor that accepts zoodata as argument.
-     */
     public MainMenu() {
         super();
         this.load();
     }
 
+    /**
+     * Creates the menu options
+     */
     public void load() {
         String[] options = {
                 "|  1   -   Display blockchain                               |",
@@ -97,38 +97,48 @@ public class MainMenu extends Menu {
         System.out.println();
         switch (option) {
             case 1:
+                //show blockchain
                 System.out.println("Blockchain:");
                 System.out.println(blockchain.getAll());
                 break;
             case 2:
+                // start the add transaction pathway
                 addTransaction();
                 break;
             case 3:
+                // mines new block after creating a block from available transactions
                 miner.createNextBlockWithAllTransactions();
                 new Thread(miner).start();
                 break;
             case 4:
+                // Switch on/off the mining service.
                 miner.flipSwitch();
                 break;
             case 5:
+                // Switch on/off the consumer service.
                 consumer.flipSwitch();
                 break;
             case 6:
+                // Switch on/off the producer service.
                 producer.flipSwitch();
                 break;
             case 7:
+                // Show transaction pool
                 System.out.println("Transaction pool:");
                 System.out.println(transactionPool.readAll());
                 break;
             case 8:
+                // Show transmission pool
                 System.out.println("Transmission pool:");
                 System.out.println(this.transmissionPool.readAll());
                 break;
             case 9:
+                // Show mining pool
                 System.out.println("Mining pool:");
                 System.out.println(miningPool.readAll());
                 break;
             case 10:
+                // read all from storage and try to add them
                 storage.readAll()
                         .stream()
                         .forEach(b -> {
@@ -136,25 +146,31 @@ public class MainMenu extends Menu {
                         });
                 break;
             case 11:
+                // write current blockchain to the storage
                 storage.writeAll(blockchain.getAll());
                 break;
             case 12:
+                // reset the blockchain and storage.
                 BlockchainHelper.resetBlockchain(blockchain, storage);
                 break;
             case 13:
+                // get a block by ID.
                 blockById();
                 break;
             case 14:
-                //runner.runTest();
+                // run a test solution
                 testSolution();
                 break;
             case 15:
+                // initialise blockchain by reading from storage or creating the genesis block.
                 runner.readOrGenerateGenesis();
                 break;
             case 16:
+                // change system difficulty
                 chooseDifficulty();
                 break;
             case 17:
+                // exit application
                 this.forceExit();
                 break;
             default:
@@ -178,11 +194,17 @@ public class MainMenu extends Menu {
 
 
     public void testSolution() {
-        System.out.println("The program will create sample transactions and mine three a few blocks, sending them as soon as ready.");
-        System.out.println("Than, another block will be mined, however will not be inserted into the blockchain.");
-        System.out.println("After mined, the block will be sent to the network and then retrieved by this node.");
+        System.out.println("                  TESTING PROCEDURE");
+        System.out.println("--------------------------------------------------------");
+        System.out.println("- The program will create sample transactions and mine a few blocks,\n" +
+                " broadcasting them as soon as they get ready.");
+        System.out.println("- Another block will be mined, however will not be inserted into the blockchain.");
+        System.out.println("- After mined, the block's ID will be changed and the block WILL NOT be re-hashed.");
+        System.out.println("- The tampered block is sent to the network and then retrieved by this node.");
+        System.out.println("--------------------------------------------------------");
+
         try {
-            Thread.sleep(3000);
+            Thread.sleep(4300);
             storage.clear();
             blockchain.reset();
             runner.runTest();
@@ -221,7 +243,6 @@ public class MainMenu extends Menu {
         System.out.println(t);
         if(TransactionHelper.validateTransaction(t)){
             System.out.println("Generating block for new transaction...");
-
             Block b = new Block(List.of(t));
             transmissionPool.add(b);
         }

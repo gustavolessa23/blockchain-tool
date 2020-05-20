@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Consumer class
+ * Consumer class that periodically listens to blocks from the network and tries to add them to the blockchain.
  */
 @ApplicationScoped
 public class Consumer implements Runnable {
@@ -38,12 +38,14 @@ public class Consumer implements Runnable {
         this.resetExecutor();
     }
 
+    // create new executor
     public void resetExecutor() {
         if (scheduler != null) scheduler.shutdown();
 
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    // start listening to blocks
     public void startListening() {
         if (scheduler != null) scheduler.shutdown();
         this.resetExecutor();
@@ -51,13 +53,14 @@ public class Consumer implements Runnable {
         scheduler.scheduleWithFixedDelay(this, 0, 1L, TimeUnit.SECONDS);
     }
 
+    // stop listening to blocks
     public void stopListening() {
         System.out.println("Stopping to listen to new blocks...");
         scheduler.shutdown();
         // resetExecutor();
     }
 
-
+    // flip the switch, turning off when on.
     public void flipSwitch() {
         if (scheduler.isShutdown()) {
             this.startListening();
@@ -66,15 +69,19 @@ public class Consumer implements Runnable {
         }
     }
 
+    // close service on application shutdown
     void onStop(@Observes ShutdownEvent ev) {
         scheduler.shutdown();
     }
 
+    /**
+     * Method to retrieve blocks from the network.
+     */
     @Override
     public void run() {
-        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createTopic("blocks"));
-            while (true) {
+        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) { // create connection
+            JMSConsumer consumer = context.createConsumer(context.createTopic("blocks")); // set message topic (all members receive all messages)
+          //  while (true) {
                 TextMessage message = (TextMessage) consumer.receive();
                 if (message == null) {
                     return;
@@ -100,7 +107,7 @@ public class Consumer implements Runnable {
                 } else {
                     System.err.println("Received block is already in the blockchain.");
                 }
-            }
+           // }
         } catch (JMSException e) {
             throw new RuntimeException(e);
         }

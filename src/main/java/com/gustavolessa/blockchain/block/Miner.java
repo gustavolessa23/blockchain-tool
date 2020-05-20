@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Consumer class
+ * Miner class
  */
 @ApplicationScoped
 public class Miner implements Runnable {
 
-    private ScheduledExecutorService scheduler;
+    private ScheduledExecutorService scheduler; // service to schedule tasks
 
     @Inject
     MiningPool miningPool;
@@ -50,6 +50,9 @@ public class Miner implements Runnable {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    /**
+     * Start listening to blocks being added to the mining pool
+     */
     public void startMining() {
         scheduler.shutdown();
         this.resetExecutor();
@@ -57,12 +60,18 @@ public class Miner implements Runnable {
         scheduler.scheduleWithFixedDelay(this, 0, 3L, TimeUnit.SECONDS);
     }
 
+    /**
+     * Stop listening to blocks.
+     */
     public void stopMining() {
         System.out.println("Stopping to mine new blocks...");
         scheduler.shutdown();
         //  this.resetExecutor();
     }
 
+    /**
+     * Switch on if off and vice versa.
+     */
     public void flipSwitch() {
         if (scheduler.isShutdown()) {
             this.startMining();
@@ -75,42 +84,46 @@ public class Miner implements Runnable {
         scheduler.shutdown();
     }
 
+    /**
+     * Checks for blocks to mine, mine one, add to the blockchain, save to the storage and add to the transmission pool.
+     */
     @Override
     public void run() {
 
-        //createNextBlockWithAllTransactions();
-
-        if (!miningPool.isEmpty()) {
-            Block blockToMine = miningPool.getFirst();
+        if (!miningPool.isEmpty()) { // if there is a block
+            Block blockToMine = miningPool.getFirst(); // the the first
             long previousId = 0L;
             String previousHash = "0";
 
             try {
-                previousHash = chain.getLastBlock().getHash();
+                previousHash = chain.getLastBlock().getHash(); // get the hash and ID
                 previousId = chain.getLastBlock().getId();
             } catch (Exception e) {
                 System.err.println("This is the genesis block.");
             }
-            blockToMine.setId(previousId + 1);
+            blockToMine.setId(previousId + 1); // set the ID and reference to the previous block
             blockToMine.setPreviousHash(previousHash);
 
             System.err.println("Mining block...");
-            blockToMine.mine(Runner.difficulty);
+            blockToMine.mine(Runner.difficulty); // mine the block
 
-            List<Block> tmp = new ArrayList<>(chain.getAll());
-            tmp.add(blockToMine);
+            List<Block> tmp = new ArrayList<>(chain.getAll()); // create a new blockchain using the existing data
+            tmp.add(blockToMine); // add the mined block
 
-            if (BlockchainHelper.isChainValid(tmp, Runner.difficulty)) {
+            if (BlockchainHelper.isChainValid(tmp, Runner.difficulty)) { // check if they form a correct chain
                 System.err.println("Block ID " + blockToMine.getId() + " is valid.");
-                chain.add(blockToMine);
-                storage.saveBlock(blockToMine);
-                transmissionPool.add(blockToMine);
+                chain.add(blockToMine); // add to the chain
+                storage.saveBlock(blockToMine); // save to storage
+                transmissionPool.add(blockToMine); // add to transmission pool
             } else {
                 System.err.println("Block invalid for the chain.");
             }
         }
     }
 
+    /**
+     * Creates and mines a block with the first transaction of the transaction pool, if existent.
+     */
     public void createNextBlockWithAllTransactions() {
         if (!transactionPool.isEmpty()) {
             System.out.println("Creating new block from transactions...");

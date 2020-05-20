@@ -7,10 +7,13 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that represents the blockchain
+ */
 @ApplicationScoped
 public class Blockchain implements Cloneable {
 
-    private List<Block> blockchain;
+    private List<Block> blockchain; // store blocks in a list
 
     public Blockchain() {
         blockchain = new ArrayList<>();
@@ -44,6 +47,11 @@ public class Blockchain implements Cloneable {
         System.err.println("Blockchain replaced.");
     }
 
+    /**
+     * Add a block by comparing chain size before and after insertion.
+     * @param b Block to add
+     * @return true if added
+     */
     public boolean add(Block b) {
         int sizeBefore = blockchain.size();
         blockchain.add(b);
@@ -57,9 +65,6 @@ public class Blockchain implements Cloneable {
         }
     }
 
-    public boolean contains(Block b) {
-        return blockchain.contains(b);
-    }
 
     public int size() {
         return blockchain.size();

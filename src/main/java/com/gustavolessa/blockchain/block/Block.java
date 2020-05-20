@@ -34,20 +34,6 @@ public class Block {
         this.hash = BlockHelper.calculateHash(this);
     }
 
-    /**
-     * Calculates the hash using SHA256
-     *
-     * @return
-     */
-//    public String calculateHash() {
-//        StringBuilder sb = new StringBuilder(previousHash);
-//        sb.append(timeStamp);
-//        for (int x = 0; x < data.size(); x++) {
-//            sb.append(data.get(x));
-//        }
-//        sb.append(nonce);
-//        return StringUtils.applySha256(sb.toString());
-//    }
 
     /**
      * Mine the block, according to a difficulty level.

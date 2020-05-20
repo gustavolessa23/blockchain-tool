@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Generic pool class that uses a Queue to store data.
+ * @param <T>
+ */
 public abstract class AbstractQueuePool<T> implements GenericPool<T> {
 
     Queue<T> pool;

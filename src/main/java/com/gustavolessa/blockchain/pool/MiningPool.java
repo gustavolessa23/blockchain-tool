@@ -4,6 +4,9 @@ import com.gustavolessa.blockchain.block.Block;
 
 import javax.enterprise.context.ApplicationScoped;
 
+/**
+ * Pool of blocks to store a queue of blocks waiting to be mined.
+ */
 @ApplicationScoped
 public class MiningPool extends AbstractQueuePool<Block> {
 

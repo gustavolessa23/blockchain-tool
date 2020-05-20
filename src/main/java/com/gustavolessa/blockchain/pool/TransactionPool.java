@@ -6,6 +6,9 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Queue pool of transactions, storing the one in line to be added to blocks.
+ */
 @ApplicationScoped
 public class TransactionPool extends AbstractQueuePool<Transaction> {
 

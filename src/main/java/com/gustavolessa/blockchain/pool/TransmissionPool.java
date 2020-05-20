@@ -6,6 +6,9 @@ import javax.enterprise.context.ApplicationScoped;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Block queue pool, to hold blocks waiting to be transmitted.
+ */
 @ApplicationScoped
 public class TransmissionPool extends AbstractQueuePool<Block> {
 

@@ -26,11 +26,9 @@ public class Main {
         @Override
         public int run(String... args) throws Exception {
 
-            runner.init();
+            runner.init(); // initialise services
 
-            menu.startMenu();
-
-            // Quarkus.waitForExit();
+            menu.startMenu(); // start menu
 
             return 0;
         }

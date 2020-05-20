@@ -21,6 +21,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Implements the StorageDAO to allow bocks to be saved to local storage.
+ */
 @ApplicationScoped
 public class LocalStorage implements StorageDAO {
 
