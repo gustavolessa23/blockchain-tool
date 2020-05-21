@@ -58,7 +58,6 @@ docker run -i --rm --env BDT_PORT=8079 MESSAGING_IP=54.85.47.98:61616 MESSAGING_
 ```
 
 
-
 ## Packaging and running the application
 
 The application can be packaged using `./mvnw package`.
@@ -66,6 +65,7 @@ It produces the `blockchain-tool-1.0.0-SNAPSHOT-runner.jar` file in the `/target
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
 
 The application is now runnable using `java -jar target/blockchain-tool-1.0.0-SNAPSHOT-runner.jar`.
+
 
 ## Creating a native executable
 
