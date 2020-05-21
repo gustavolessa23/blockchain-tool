@@ -7,8 +7,9 @@ import com.gustavolessa.blockchain.block.Block;
 import com.gustavolessa.blockchain.storage.StorageDAO;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,21 +21,36 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Implements the StorageDAO to allow bocks to be saved to local storage.
+ */
 @ApplicationScoped
 public class LocalStorage implements StorageDAO {
 
-    static final Path path = Paths.get("blockdata");
-    static String folder = "blockdata";
-    static String PATH = File.pathSeparatorChar + folder + File.pathSeparatorChar;
+    static Path path;
 
+    public LocalStorage() {
+        this.getPath();
+    }
+
+    public void getPath() {
+        try {
+            path = Paths.get("blockdata");
+            if (Files.notExists(path)) Files.createDirectory(path);
+
+        } catch (IOException e) {
+        } catch (Exception e) {
+
+        }
+    }
 
     @Override
     public int saveBlock(Block block) {
         try {
-            Files.createDirectories(path);
+            getPath();
             String blockJson = new GsonBuilder().setPrettyPrinting().create().toJson(block);
-            Files.write(path.resolve(block.hash), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-
+            Path returned = Files.write(path.resolve(block.getHash()), blockJson.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            System.out.println("Block saved at: " + returned);
             return 1;
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
@@ -44,6 +60,7 @@ public class LocalStorage implements StorageDAO {
 
     @Override
     public List<Block> readAll() {
+        System.out.println("Reading all blocks from storage...");
         try (Stream<Path> walk = Files.walk(path)) {
 
             List<Block> result = walk.filter(Files::isRegularFile)
@@ -56,28 +73,38 @@ public class LocalStorage implements StorageDAO {
 
         } catch (IOException e) {
             e.printStackTrace();
+            return new ArrayList<Block>();
         }
-        return null;
     }
 
-    private Block getBlock(Path path){
+    @Override
+    public void clear() {
+        try (Stream<Path> walk = Files.walk(path)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Block getBlock(Path path) {
         Gson gson = new Gson();
         try {
-          //  System.out.println("Trying: " + path.toString());
             byte[] content = Files.readAllBytes(path);
             Object obj = gson.fromJson(new String(content), Block.class);
             Block block = (Block) obj;
-            System.out.println("Hash read: " + block.hash);
+            System.out.println("Hash read: " + block.getHash());
 
             return block;
         } catch (JsonSyntaxException e) {
-            System.err.println("JsonSyntaxException when reading "+ path.toString());
             return null;
         } catch (FileNotFoundException e) {
-            System.err.println("File not found "+ path.toString());
+            System.err.println("File not found " + path.toString());
             return null;
         } catch (IOException e) {
-            System.err.println("IOException when reading "+ path.toString());
+            System.err.println("IOException when reading " + path.toString());
             e.printStackTrace();
             return null;
         }
@@ -92,5 +119,11 @@ public class LocalStorage implements StorageDAO {
     @Override
     public Block findByHash(String hash) {
         return null;
+    }
+
+    @Override
+    public void writeAll(List<Block> blocks) {
+        System.out.println("Writing blocks to storage...");
+        blocks.stream().forEach(b -> saveBlock(b));
     }
 }
