@@ -3,54 +3,88 @@ package com.gustavolessa.blockchain.block;
 import com.google.gson.GsonBuilder;
 import com.gustavolessa.blockchain.transaction.Transaction;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class that defines a block
+ */
 public class Block {
 
-    public long id;
-    public String hash;
-    public String previousHash;
-    private List<Transaction> data;
+    private long id;
+    private String hash;
+    private String previousHash;
+    private final List<Transaction> data;
+    private final long timeStamp;
+    private int nonce;
+
+    public Block(List<Transaction> data, String previousHash, long lastId) {
+        this.id = lastId + 1;
+        this.data = data;
+        this.previousHash = previousHash;
+        this.timeStamp = new Date().getTime(); //get current time in mills on obj creation
+        this.hash = BlockHelper.calculateHash(this); // calculate hash for the transaction
+    }
+
+    public Block(List<Transaction> data) {
+        this.id = 0;
+        this.data = data;
+        this.previousHash = "";
+        this.timeStamp = new Date().getTime();
+        this.hash = BlockHelper.calculateHash(this);
+    }
+
+
+    /**
+     * Mine the block, according to a difficulty level.
+     *
+     * @param difficulty
+     * @return
+     */
+    public boolean mine(int difficulty) {
+        String target = new String(new char[difficulty]).replace('\0', '0'); // create a string from the difficulty
+        while (!hash.substring(0, difficulty).equals(target)) { // while calculated hash doesn't meet difficulty
+            nonce++; // increase the nonce
+            hash = BlockHelper.calculateHash(this); // recalculate the hash.
+        }
+        System.err.println("Block ID " + this.id + " mined.");
+        return true;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public List<Transaction> getData() {
+        return data;
+    }
 
     public long getTimeStamp() {
         return timeStamp;
     }
 
-    private long timeStamp;
-    private int nonce;
+    public int getNonce() {
+        return nonce;
+    }
 
-    public Block(List<Transaction> data, String previousHash, long lastId){
-        this.data = data;
+    public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;
-        this.timeStamp = new Date().getTime();
-        this.hash = getHash();
-        this.id = lastId + 1;
-
-    }
-
-    public String getHash(){
-        StringBuilder sb = new StringBuilder(previousHash);
-        sb.append(timeStamp);
-        for(int x = 0; x < data.size(); x++){
-            sb.append(data.get(x));
-        }
-        sb.append(nonce);
-        return BlockHelper.calculateHash(sb.toString());
-    }
-
-    public void mine(int difficulty){
-        String target = new String(new char[difficulty]).replace('\0','0');
-
-        while(!hash.substring(0, difficulty).equals(target)){
-            nonce++;
-            hash = getHash();
-        }
     }
 
     @Override
     public String toString() {
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
