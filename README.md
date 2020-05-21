@@ -28,7 +28,7 @@ When running the application with no environment variables, it uses the default 
 It is a sample server deployed to EC2 and available for a couple of months after this solution was submitted.
 
 
-## Environment variables
+### Environment variables
 The system accepts a few environment variables to customise the application at runtime:
 ```
 export BDT_PORT=8000
