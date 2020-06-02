@@ -40,7 +40,7 @@ export MESSAGING_PASS=pass1234!
 ### Using Maven and this repo to run the application
 You can, then, run your application in dev mode that enables live coding, by cloning this repo and running the following command:
 ```
-./mvnw quarkus:dev
+./mvnw compile quarkus:dev
 ```
 
 
