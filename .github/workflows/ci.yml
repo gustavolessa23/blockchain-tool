@@ -57,5 +57,6 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
           
       -
-        name: Image digest
+        name: Image digest 
         run: echo ${{ steps.docker_build.outputs.digest }}
+
