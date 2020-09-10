@@ -12,51 +12,88 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Prepare
-        id: prep
-        run: |
-          DOCKER_IMAGE=name/app
-          VERSION=edge
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
-          fi
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=nightly
-          fi
-          TAGS="${DOCKER_IMAGE}:${VERSION}"
-          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            TAGS="$TAGS,${DOCKER_IMAGE}:latest"
-          fi
-          echo ::set-output name=tags::${TAGS}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1 
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./src/main/docker/Dockerfile.jvm
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prep.outputs.tags }}
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Prepare
+      if: success()
+      id: prepare
+      run: |
+        echo ::set-output name=docker_platforms::linux/amd64,linux/arm64
+        echo ::set-output name=docker_username::${{ secrets.DOCKER_USERNAME }}
+        echo ::set-output name=docker_image::gustavolessadublin/blockchain-tool
+        echo ::set-output name=version::${GITHUB_REF#refs/*/}
+        echo ::set-output name=hash::${GITHUB_SHA}
+        
+    - name: Docker Login
+      if: success()
+      env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin docker.io
+        
+    - name: Run Buildx (master)
+      if: success() && contains(steps.prepare.outputs.version, 'master')
+      run: |
+        docker buildx build \
+          --output type=image,name=${{ steps.prepare.outputs.docker_image }},push=true \
+          --platform ${{ steps.prepare.outputs.docker_platforms }} \
+          --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
+          --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.hash }}" \
+          --tag "${{ steps.prepare.outputs.docker_image }}:latest" \
+          --file ./src/main/docker/Dockerfile.jvm .
+    - name: Run Buildx (non-master)
+      if: success() && !contains(steps.prepare.outputs.version, 'master')
+      run: |
+        docker buildx build \
+          --output type=image,name=${{ steps.prepare.outputs.docker_image }},push=true \
+          --platform ${{ steps.prepare.outputs.docker_platforms }} \
+          --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
+         --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.hash }}" \
+          --file ./src/main/docker/Dockerfile.jvm .
+ 
+#       -
+#         name: Prepare
+#         id: prep
+#         run: |
+#           DOCKER_IMAGE=name/app
+#           VERSION=edge
+#           if [[ $GITHUB_REF == refs/tags/* ]]; then
+#             VERSION=${GITHUB_REF#refs/tags/v}
+#           fi
+#           if [ "${{ github.event_name }}" = "schedule" ]; then
+#             VERSION=nightly
+#           fi
+#           TAGS="${DOCKER_IMAGE}:${VERSION}"
+#           if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+#             TAGS="$TAGS,${DOCKER_IMAGE}:latest"
+#           fi
+#           echo ::set-output name=tags::${TAGS}
+#       -
+#         name: Set up QEMU
+#         uses: docker/setup-qemu-action@v1
+#       -
+#         name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v1
+#       -
+#         name: Login to DockerHub
+#         if: github.event_name != 'pull_request'
+#         uses: docker/login-action@v1 
+#         with:
+#           username: ${{ secrets.DOCKER_USERNAME }}
+#           password: ${{ secrets.DOCKER_PASSWORD }}
+#       -
+#         name: Build and push
+#         id: docker_build
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: .
+#           file: ./src/main/docker/Dockerfile.jvm
+#           platforms: linux/amd64,linux/arm64
+#           push: ${{ github.event_name != 'pull_request' }}
+#           tags: ${{ steps.prep.outputs.tags }}
           
-      -
-        name: Image digest 
-        run: echo ${{ steps.docker_build.outputs.digest }}
+#       -
+#         name: Image digest 
+#         run: echo ${{ steps.docker_build.outputs.digest }}
 
